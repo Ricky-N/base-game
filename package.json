@@ -1,0 +1,28 @@
+{
+  "name": "BaseGame",
+  "version": "1.0.0",
+  "description": "A simple multiplayer 2d top down game setup built on top of Isogenic Game Engine",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "Isogenic",
+    "Game",
+    "Engine",
+    "IGE",
+    "Multiplayer",
+    "Game",
+    "Javascript"
+  ],
+  "author": "Ricky Niemi",
+  "license": "MIT",
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-develop-server": "^0.5.0",
+    "gulp-jshint": "^2.0.0",
+    "gulp-webserver": "^0.9.1",
+    "jshint": "^2.8.0"
+  }
+}
