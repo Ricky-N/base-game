@@ -1,142 +1,149 @@
-// This is a hacky way to make the "Player" class while enabling
-// private functions and variables
-var player = (function()
+function Control()
 {
-		this.classId = 'PlayerComponent';
-		this.componentId = 'playerControl';
+	this.classId = "Control";
 
-		this.init = function (entity, options) {
-			var self = this;
-
-			// Store the entity that this component has been added to
-			this._entity = entity;
-
-			// Store any options that were passed to us
-			this._options = options;
-
-			this.controls = {
-				left: false,
-				right: false,
-				up: false,
-				down: false
-			};
-
-			this._speed = 0.1;
-
-			// Setup the control system
-			ige.input.mapAction('left', ige.input.key.left);
-			ige.input.mapAction('right', ige.input.key.right);
-			ige.input.mapAction('up', ige.input.key.up);
-			ige.input.mapAction('down', ige.input.key.down);
-
-			// Add the playerComponent behaviour to the entity
-			this._entity.addBehaviour('playerComponent_behaviour', this._behaviour);
-		}
-
-		/**
-		 * Called every frame by the engine when this entity is mounted to the
-		 * scenegraph.
-		 * @param ctx The canvas context to render to.
-		 */
-		this._behaviour = function (ctx) {
-			/* CEXCLUDE */
-			if (ige.isServer) {
-				if (this.playerControl.controls.left) {
-					this.velocity.x(-this.playerControl._speed);
-				} else if (this.playerControl.controls.right) {
-					this.velocity.x(this.playerControl._speed);
-				} else {
-					this.velocity.x(0);
-				}
-
-				if (this.playerControl.controls.up) {
-					this.velocity.y(-this.playerControl._speed);
-				} else if (this.playerControl.controls.down) {
-					this.velocity.y(this.playerControl._speed);
-				} else {
-					this.velocity.y(0);
-				}
-			}
-			/* CEXCLUDE */
-
-			if (ige.isClient) {
-				if (ige.input.actionState('left')) {
-					if (!this.playerControl.controls.left) {
-						// Record the new state
-						this.playerControl.controls.left = true;
-
-						// Tell the server about our control change
-						ige.network.send('playerControlLeftDown');
-					}
-				} else {
-					if (this.playerControl.controls.left) {
-						// Record the new state
-						this.playerControl.controls.left = false;
-
-						// Tell the server about our control change
-						ige.network.send('playerControlLeftUp');
-					}
-				}
-
-				if (ige.input.actionState('right')) {
-					if (!this.playerControl.controls.right) {
-						// Record the new state
-						this.playerControl.controls.right = true;
-
-						// Tell the server about our control change
-						ige.network.send('playerControlRightDown');
-					}
-				} else {
-					if (this.playerControl.controls.right) {
-						// Record the new state
-						this.playerControl.controls.right = false;
-
-						// Tell the server about our control change
-						ige.network.send('playerControlRightUp');
-					}
-				}
-
-				if (ige.input.actionState('up')) {
-					if (!this.playerControl.controls.up) {
-						// Record the new state
-						this.playerControl.controls.up = true;
-
-						// Tell the server about our control change
-						ige.network.send('playerControlUpDown');
-					}
-				} else {
-					if (this.playerControl.controls.up) {
-						// Record the new state
-						this.playerControl.controls.up = false;
-
-						// Tell the server about our control change
-						ige.network.send('playerControlUpUp');
-					}
-				}
-
-				if (ige.input.actionState('down')) {
-					if (!this.playerControl.controls.down) {
-						// Record the new state
-						this.playerControl.controls.down = true;
-
-						// Tell the server about our control change
-						ige.network.send('playerControlDownDown');
-					}
-				} else {
-					if (this.playerControl.controls.down) {
-						// Record the new state
-						this.playerControl.controls.down = false;
-
-						// Tell the server about our control change
-						ige.network.send('playerControlDownUp');
-					}
-				}
-			}
-		}
-
-		return this;
+	this.init = function()
+	{
+		this._active = false;
 	}
-)();
 
-var PlayerComponent = IgeEntity.extend(player);
+	this.activate = function()
+	{
+		if(!this._active)
+		{
+			this._active = true;
+			this.onActivation();
+		}
+	}
+
+	this.onActivation = function()
+	{
+		throw "Must be overridden by child classes";
+	}
+
+	this.deactivate = function()
+	{
+		if(this._active)
+		{
+			this._active = false;
+			this.onDeactivation();
+		}
+	}
+
+	this.onDeactivation = function()
+	{
+		throw "Must be overridden by child classes";
+	}
+}
+var Control = IgeClass.extend(new Control());
+
+function DirectionControl()
+{
+	this.classId = "DirectionControl";
+
+	this.init = function(direction, igeKey)
+	{
+	 Control.prototype.init.call(this);
+	 this.direction = direction;
+	 ige.input.mapAction(direction, igeKey);
+ 	}
+
+	// we don't want to get in a state where the client and
+	// server are on opposite sides of the same toggle so send
+	// the value directly
+	this.updateFunc = function()
+	{
+		if(ige.isClient)
+		{
+			var data = {
+				"direction": this.direction,
+				"setting": this._active
+			};
+			ige.network.send("controlUpdate", data);
+		}
+	}
+
+	this.onActivation = function()
+	{
+		this.updateFunc();
+	}
+
+	this.onDeactivation = function()
+	{
+		this.updateFunc();
+	}
+}
+var DirectionControl = Control.extend(new DirectionControl);
+
+function Controls()
+{
+	this.classId = 'PlayerComponent';
+	this.componentId = 'playerControl';
+
+	this.init = function (entity, options) {
+		var self = this;
+
+		// Store the entity that this component has been added to
+		this._entity = entity;
+		// Store any options that were passed to us
+		this._options = options;
+		this.controls = {
+			left: new DirectionControl('left', ige.input.key.left),
+			right: new DirectionControl('right', ige.input.key.right),
+			up: new DirectionControl('up', ige.input.key.up),
+			down: new DirectionControl('down', ige.input.key.down)
+		};
+
+		this._speed = 0.2;
+		// Add the playerComponent behaviour to the entity
+		this._entity.addBehaviour('playerComponent_behaviour', this._behaviour);
+	}
+
+	/**
+	 * Called every frame by the engine when this entity is mounted to the
+	 * scenegraph.
+	 * @param ctx The canvas context to render to.
+	 */
+	this._behaviour = function (ctx) {
+		var controls = this.playerControl.controls;
+
+		if (ige.isServer)
+		{
+			var speed = this.playerControl._speed;
+
+			// set up control precedents
+			var x = controls.left._active ? -1 :
+						  controls.right._active ? 1 : 0;
+			var y = controls.up._active ? -1 :
+							controls.down._active ? 1 : 0;
+
+			// we want the character to move the same speed no matter
+			// which direction they are going, so normalize and multiply by speed
+			var norm = Math2d.normalize(new Vector2d(x,y));
+			var vel = Math2d.scale(norm, speed);
+			this.velocity.x(vel.x);
+			this.velocity.y(vel.y);
+		}
+		else // => ige.isClient
+		{
+			for(var key in controls)
+			{
+				if(controls.hasOwnProperty(key)){
+				  if(ige.input.actionState(controls[key].direction))
+					{
+						controls[key].activate();
+					}
+					else
+					{
+						controls[key].deactivate();
+					}
+				}
+			}
+		}
+	}
+
+	return this;
+};
+
+var PlayerComponent = IgeEntity.extend(new Controls());
 if (typeof(module) !== 'undefined' && typeof(module.exports) !== 'undefined') { module.exports = PlayerComponent; }

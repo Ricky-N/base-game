@@ -27,7 +27,7 @@ gulp.task('server:static', function() {
 
 // watch task to reprocess src and maybe restart server when changed
 gulp.task("watch", ["server"], function () {
-    gulp.watch("./**/*.js").on("change", function(event){
+    gulp.watch("src/**/*.js").on("change", function(event){
       console.log("\r\nFile " + event.path + " was " + event.type + ", running tasks...");
       return socketServer.restart(function(){
         console.log("Server restarted");

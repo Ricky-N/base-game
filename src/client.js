@@ -11,7 +11,7 @@ var Client = IgeClass.extend({
 		// Enable networking
 		ige.addComponent(IgeNetIoComponent);
 		// Implement our game methods
-		this.implement(ClientNetworkEvents);
+		//this.implement(ClientNetworkEvents);
 		// Create the HTML canvas
 		ige.createFrontBuffer(true);
 
@@ -32,7 +32,7 @@ var Client = IgeClass.extend({
 					// got a username or something?
 					ige.network.start('http://localhost:2000', function () {
 						// Setup the network command listeners
-						ige.network.define('playerEntity', self._onPlayerEntity); // Defined in ./gameClasses/ClientNetworkEvents.js
+						ClientNetworkEvents.listen();
 
 						// Setup the network stream handler
 						ige.network.addComponent(IgeStreamComponent)
@@ -72,42 +72,7 @@ var Client = IgeClass.extend({
 							.drawBounds(false)
 							.mount(ige);
 
-						// // Create the texture map that will work as our "tile background"
-						// // Create the texture maps
-						// self.textureMap1 = new IgeTextureMap()
-						// 	.depth(0)
-						// 	.tileWidth(32)
-						// 	.tileHeight(32)
-						// 	//.drawGrid(3)
-						// 	.drawMouse(true)
-						// 	.translateTo(0, 0, 0)
-						// 	.drawBounds(false)
-						// 	.autoSection(10)
-						// 	.drawSectionBounds(true)
-						// 	//.isometricMounts(true)
-						// 	//.translateTo(300, 300, 0)
-						// 	.mount(self.backgroundScene);
-						//
-						// var texIndex = self.textureMap1.addTexture(self.textures.grassSheet);
-						// // Ask the server to send us the tile data
-						// ige.network.request('gameTiles', {}, function (commandName, data) {
-						// 	console.log('gameTiles response', data);
-						//
-						// 	// Paint the texture map based on the data sent from the server
-						// 	var x, y, tileData;
-						// 	for (x = 0; x < data.length; x++) {
-						// 		for (y = 0; y < data[x].length; y++) {
-						// 			tileData = data[x][y];
-						// 			self.textureMap1.paintTile(x, y, tileData[0], tileData[1]);
-						// 		}
-						// 	}
-						//
-						// 	// Now set the texture map's cache data to dirty so it will
-						// 	// be redrawn
-						// 	self.textureMap1.cacheDirty(true);
-						// });
-
-						ige.network.request('map', {}, function(commandName, data){
+						ige.network.request('requestMap', {}, function(commandName, data){
 							ige.addComponent(IgeTiledComponent)
 								 .tiled.loadJson(data, function(layers, layersById) {
 									 for(var i = 0; i < layers.length; i++)

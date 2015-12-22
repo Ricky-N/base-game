@@ -23,26 +23,8 @@ var Server = IgeClass.extend({
 				ige.start(function (success) {
 					// Check if the engine started successfully
 					if (success) {
-						// Create some network commands we will need
-						ige.network.define('map', function (data, clientId, requestId) {
-							// Send the Map data back
-							ige.network.response(requestId, Map);
-						});
-
-						ige.network.define('playerEntity', self._onPlayerEntity);
-
-						ige.network.define('playerControlLeftDown', self._onPlayerLeftDown);
-						ige.network.define('playerControlRightDown', self._onPlayerRightDown);
-						ige.network.define('playerControlUpDown', self._onPlayerUpDown);
-						ige.network.define('playerControlDownDown', self._onPlayerDownDown);
-
-						ige.network.define('playerControlLeftUp', self._onPlayerLeftUp);
-						ige.network.define('playerControlRightUp', self._onPlayerRightUp);
-						ige.network.define('playerControlUpUp', self._onPlayerUpUp);
-						ige.network.define('playerControlDownUp', self._onPlayerDownUp);
-
-						ige.network.on('connect', self._onPlayerConnect); // Defined in ./gameClasses/ServerNetworkEvents.js
-						ige.network.on('disconnect', self._onPlayerDisconnect); // Defined in ./gameClasses/ServerNetworkEvents.js
+						// begin listening to incoming network events
+						ServerNetworkEvents.listen();
 
 						// Add the network stream component
 						ige.network.addComponent(IgeStreamComponent)
@@ -73,23 +55,6 @@ var Server = IgeClass.extend({
 							.scene(self.mainScene)
 							.drawBounds(true)
 							.mount(ige);
-
-						// Generate some random data for our background texture map
-						// this data will be sent to the client when the server receives
-						// a "gameTiles" network command
-						var rand, x, y;
-						for (x = 0; x < 20; x++) {
-							for (y = 0; y < 20; y++) {
-								rand = Math.ceil(Math.random() * 4);
-								self.tileData[x] = self.tileData[x] || [];
-
-								// We assign [0, rand] here as we are assuming that the
-								// tile will use the textureIndex 0. If you assign different
-								// textures to the client-side textureMap then want to use them
-								// you will need to alter the 0 to whatever texture you want to use
-								self.tileData[x][y] = [0, rand];
-							}
-						}
 					}
 				});
 			});

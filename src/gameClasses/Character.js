@@ -1,13 +1,10 @@
-// Define our player character classes
-var Character = IgeEntity.extend({
-	classId: 'Character',
+function Character()
+{
+	this.classId = 'Character',
 
-	init: function () {
+	this.init = function () {
 		var self = this;
 		IgeEntity.prototype.init.call(this);
-
-		// Set the co-ordinate system as isometric
-		//this.isometric(true);
 
 		if (ige.isServer) {
 			this.addComponent(IgeVelocityComponent);
@@ -40,7 +37,7 @@ var Character = IgeEntity.extend({
 	 * appearance.
 	 * @return {*}
 	 */
-	setType: function (type) {
+	this.setType = function (type) {
 		switch (type) {
 			case 0:
 				this.animation.define('walkDown', [1, 2, 3, 2], 8, -1)
@@ -128,7 +125,7 @@ var Character = IgeEntity.extend({
 		return this;
 	},
 
-	update: function (ctx, tickDelta) {
+	this.update = function (ctx, tickDelta) {
 		if (ige.isClient) {
 			// Set the current animation based on direction
 			var self = this,
@@ -193,7 +190,7 @@ var Character = IgeEntity.extend({
 		IgeEntity.prototype.update.call(this, ctx, tickDelta);
 	},
 
-	destroy: function () {
+	this.destroy = function () {
 		// Destroy the texture object
 		if (this._characterTexture) {
 			this._characterTexture.destroy();
@@ -202,6 +199,7 @@ var Character = IgeEntity.extend({
 		// Call the super class
 		IgeEntity.prototype.destroy.call(this);
 	}
-});
+}
 
+var Character = IgeEntity.extend(new Character());
 if (typeof(module) !== 'undefined' && typeof(module.exports) !== 'undefined') { module.exports = Character; }
