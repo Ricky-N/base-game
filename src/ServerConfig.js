@@ -1,5 +1,6 @@
 var config = {
 	include: [
+		{name: 'Map', path: '../assets/map/map'},
 		{name: 'ServerNetworkEvents', path: './gameClasses/ServerNetworkEvents'},
 		{name: 'Character', path: './gameClasses/Character'},
 		{name: 'PlayerComponent', path: './gameClasses/PlayerComponent'}

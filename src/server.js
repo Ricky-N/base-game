@@ -24,11 +24,9 @@ var Server = IgeClass.extend({
 					// Check if the engine started successfully
 					if (success) {
 						// Create some network commands we will need
-						ige.network.define('gameTiles', function (data, clientId, requestId) {
-							console.log('Client gameTiles command received from client id "' + clientId + '" with data:', data);
-
-							// Send the tile data back
-							ige.network.response(requestId, self.tileData);
+						ige.network.define('map', function (data, clientId, requestId) {
+							// Send the Map data back
+							ige.network.response(requestId, Map);
 						});
 
 						ige.network.define('playerEntity', self._onPlayerEntity);
