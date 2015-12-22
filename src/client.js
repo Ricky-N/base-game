@@ -62,6 +62,69 @@ var Client = IgeClass.extend({
 							.ignoreCamera(true)
 							.mount(self.mainScene);
 
+						ige.ui.style('.controlPanel', {
+							'width': '80%',
+							'height': '7%',
+							'bottom': '3%',
+							'right': '10%'
+						});
+
+						ige.ui.style('.healthBar', {
+							'width': '80%',
+							'height': '45%',
+							'borderColor': 'black',
+							'boderWidth': 3,
+							'backgroundColor': 'green',
+							'top': '0%',
+							'left': '0%'
+						});
+
+						ige.ui.style('.powerBar', {
+							'width': '80%',
+							'height': '45%',
+							'borderColor': 'black',
+							'boderWidth': 3,
+							'backgroundColor': 'blue',
+							'top': '55%%',
+							'left': '0%'
+						});
+
+						ige.ui.style('.button', {
+							'width': '15%',
+							'height': '90%',
+							'borderColor': 'black',
+							'borderWidth': 3,
+							'backgroundColor': 'brown',
+							'right': '0%',
+							'top': '5%'
+						});
+
+						ige.ui.style('.button:hover', {
+							'backgroundColor': 'red'
+						});
+
+						self.controlPanel = new IgeUiElement()
+							.id('controlPanel')
+							.styleClass('controlPanel')
+							.mount(self.uiScene);
+
+						new IgeUiElement()
+							.id('healthBar')
+							.styleClass('healthBar')
+							.allowFocus(false)
+							.mount(self.controlPanel);
+
+						new IgeUiElement()
+						 	.id('powerBar')
+							.styleClass('powerBar')
+							.allowFocus(false)
+							.mount(self.controlPanel);
+
+						new IgeUiElement()
+							.id('button')
+							.styleClass('button')
+							.mount(self.controlPanel);
+
 						// Create the main viewport and set the scene
 						// it will "look" at as the new scene1 we just
 						// created above
