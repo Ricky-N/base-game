@@ -87,11 +87,14 @@ function Controls()
 		this._entity = entity;
 		// Store any options that were passed to us
 		this._options = options;
+		// DirectionControl is probably a bad name at this point
 		this.controls = {
-			left: new DirectionControl('left', ige.input.key.left),
-			right: new DirectionControl('right', ige.input.key.right),
-			up: new DirectionControl('up', ige.input.key.up),
-			down: new DirectionControl('down', ige.input.key.down)
+			left: new DirectionControl('left', ige.input.key.a),
+			right: new DirectionControl('right', ige.input.key.d),
+			up: new DirectionControl('up', ige.input.key.w),
+			down: new DirectionControl('down', ige.input.key.s),
+			action1: new DirectionControl('action1', ige.input.key.q),
+			action2: new DirectionControl('action2', ige.input.key.e)
 		};
 
 		this._speed = 0.2;
@@ -123,6 +126,18 @@ function Controls()
 			var vel = Math2d.scale(norm, speed);
 			this.velocity.x(vel.x);
 			this.velocity.y(vel.y);
+
+			// for now q will just drain health :)
+			if(controls.action1._active)
+			{
+				this.status.health = this.status.health - 1;
+			}
+
+			// and e will drain power ;)
+			if(controls.action2._active)
+			{
+				this.status.power = this.status.power - 1;
+			}
 		}
 		else // => ige.isClient
 		{

@@ -7,6 +7,7 @@ var config = {
 		{name: 'Math2d', path: './gameClasses/Math2d'},
 		{name: 'Map', path: '../assets/map/map'},
 		{name: 'ServerNetworkEvents', path: './gameClasses/ServerNetworkEvents'},
+		{name: 'StatusComponent', path: './gameClasses/StatusComponent'},
 		{name: 'Character', path: './gameClasses/Character'},
 		{name: 'PlayerComponent', path: './gameClasses/PlayerComponent'}
 	]

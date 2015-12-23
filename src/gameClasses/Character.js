@@ -2,15 +2,21 @@ function Character()
 {
 	this.classId = 'Character',
 
-	this.init = function () {
+	this.init = function (streamCreateData) {
 		var self = this;
 		IgeEntity.prototype.init.call(this);
+
+		this.addComponent(StatusComponent);
 
 		if (ige.isServer) {
 			this.addComponent(IgeVelocityComponent);
 		}
+		else // ige.isClient
+		{
+			streamCreateData = JSON.parse(streamCreateData);
+			this.status.health = streamCreateData.health;
+			this.status.power = streamCreateData.power;
 
-		if (ige.isClient) {
 			// Setup the entity
 			self.addComponent(IgeAnimationComponent)
 				.depth(1);
@@ -26,9 +32,66 @@ function Character()
 				self.setType(1);
 			}, false, true);
 		}
-
 		this._lastTranslate = this._translate.clone();
-	},
+		this.streamSections(['transform', 'status'])
+	}
+
+	// Prepare data fro the client to initialize
+	this.streamCreateData = function()
+	{
+		return JSON.stringify(this.status);
+	}
+
+	/**
+	 * Override the default IgeEntity class streamSectionData() method
+	 * so that we can check for the custom1 section and handle how we deal
+	 * with it.
+	 * @param {String} sectionId A string identifying the section to
+	 * handle data get / set for.
+	 * @param {*=} data If present, this is the data that has been sent
+	 * from the server to the client for this entity.
+	 * @return {*}
+	 */
+	this.streamSectionData = function(sectionId, data)
+	{
+		if(sectionId === "status")
+		{
+			// if provided data, it came from server so update
+			if(data)
+			{
+				data = JSON.parse(data);
+				this.status.health = data.health;
+				this.status.power = data.power;
+
+				// TODO move to listener, callback pattern, make it
+				// only happen for player entity, etc.
+				// for now we know that 100 is the max health :/
+				var width = data.health;
+				if(data.health < 0)
+				{
+					width = 0;
+				}
+				ige.client.controlPanel.scene.children()[0].children()[0].children()[0]
+					 .applyStyle({'width': width + '%'});
+
+				var width = data.power;
+				if(data.power < 0)
+				{
+					width = 0;
+				}
+				ige.client.controlPanel.scene.children()[0].children()[0].children()[1]
+					.applyStyle({'width': width + '%'});
+			}
+			else // otherwise it is asking for the update
+			{
+				return JSON.stringify(this.status);
+			}
+		}
+		else
+    {
+      return IgeEntity.prototype.streamSectionData.call(this, sectionId, data);
+    }
+	}
 
 	/**
 	 * Sets the type of character which determines the character's

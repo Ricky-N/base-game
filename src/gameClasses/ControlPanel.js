@@ -13,18 +13,25 @@ function ControlPanel(mainScene)
     'right': '10%'
   });
 
-  ige.ui.style('.healthBar', {
+  ige.ui.style('.statusBars', {
     'width': '80%',
-    'height': '45%',
+    'height': '100%',
     'borderColor': 'black',
     'boderWidth': 3,
+    'top': '0%',
+    'left': '0%'
+  });
+
+  ige.ui.style('.healthBar', {
+    'width': '100%',
+    'height': '45%',
     'backgroundColor': 'green',
     'top': '0%',
     'left': '0%'
   });
 
   ige.ui.style('.powerBar', {
-    'width': '80%',
+    'width': '100%',
     'height': '45%',
     'borderColor': 'black',
     'boderWidth': 3,
@@ -52,23 +59,27 @@ function ControlPanel(mainScene)
     .styleClass('controlPanel')
     .mount(this.scene);
 
-  new IgeUiElement()
-    .id('healthBar')
-    .styleClass('healthBar')
+  var statusBars = new IgeUiElement()
+    .id('statusBars')
+    .styleClass('statusBars')
     .allowFocus(false)
     .mount(controlPanel);
 
   new IgeUiElement()
+    .id('healthBar')
+    .styleClass('healthBar')
+    .mount(statusBars);
+
+  new IgeUiElement()
     .id('powerBar')
     .styleClass('powerBar')
-    .allowFocus(false)
-    .mount(controlPanel);
+    .mount(statusBars);
 
   new IgeUiElement()
     .id('button')
     .styleClass('button')
     .mount(controlPanel);
-    
+
   return this;
 }
 

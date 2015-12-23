@@ -12,6 +12,9 @@ function Client()
 		ige.addComponent(IgeNetIoComponent);
 		ige.createFrontBuffer(true);
 
+		// TODO better object here!
+		this.players = [];
+
 		// we don't do any pre-loading of textures right now, it
 		// may be a good idea to base load some in case perf in
 		// the first few seconds of gameplay start feeling slow
@@ -33,6 +36,7 @@ function Client()
 					ige.network.addComponent(IgeStreamComponent)
 						.stream.renderLatency(80)
 						.stream.on('entityCreated', function (entity) {
+							self.players.push(entity);
 							self.log('Stream entity created with ID: ' + entity.id());
 						});
 

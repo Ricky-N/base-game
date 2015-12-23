@@ -22,11 +22,9 @@ function Server()
 				if (success) {
 					// begin listening to incoming network events
 					ServerNetworkEvents.listen();
-
 					ige.network.addComponent(IgeStreamComponent)
 						 .stream.sendInterval(30)
 						 .stream.start();
-
 					ige.network.acceptConnections(true);
 
 					self.mainScene = new IgeScene2d().id('mainScene');
