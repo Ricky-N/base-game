@@ -4,6 +4,8 @@ var igeClientConfig = {
 		'./gameClasses/ClientNetworkEvents.js',
 		'./gameClasses/Character.js',
 		'./gameClasses/PlayerComponent.js',
+		'./gameClasses/ControlPanel.js',
+		'./gameClasses/Background.js',
 
 		/* Standard game scripts */
 		'./client.js',
