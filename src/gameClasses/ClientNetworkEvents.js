@@ -19,9 +19,13 @@ var ClientNetworkEvents = {
 function initPlayer(entityId)
 {
 	// Add the player control component and track with camera
-	ige.$(entityId).addComponent(PlayerComponent);
-	ige.client.vp1.camera.trackTranslate(ige.$(entityId), 50);
-	ige.client.controlPanel.trackStatus(ige.$(entityId));
+	var player = ige.$(entityId);
+	player.addComponent(PlayerComponent);
+	// have the camera follow the player
+	ige.client.vp1.camera.trackTranslate(player, 50);
+	// but start out viewing them 
+	ige.client.vp1.camera.lookAt(player, 0);
+	ige.client.controlPanel.trackStatus(player);
 }
 
 var player = new ClientNetworkMessage('playerEntity', function(entityId) {

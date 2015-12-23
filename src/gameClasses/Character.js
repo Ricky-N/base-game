@@ -8,6 +8,10 @@ function Character()
 
 		this.addComponent(StatusComponent);
 
+		// for now lets start everyone a little into the map
+		this.translate().x(400);
+		this.translate().y(350);
+
 		if (ige.isServer) {
 			this.addComponent(IgeVelocityComponent);
 		}
@@ -27,7 +31,9 @@ function Character()
 				self.texture(self._characterTexture)
 					.dimensionsFromCell();
 
-				self.setType(1);
+				// TODO: kind of funny, the same player may look
+				// different on different clients
+				self.setType(Math.floor(Math.random() * 7));
 			}, false, true);
 		}
 		this._lastTranslate = this._translate.clone();
@@ -91,6 +97,7 @@ function Character()
     }
 	}
 
+	// TODO: oh god this is bad
 	/**
 	 * Sets the type of character which determines the character's
 	 * animation sequences and appearance.

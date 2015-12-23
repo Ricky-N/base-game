@@ -54,7 +54,7 @@ function Client()
 						.scene(self.mainScene)
 						.drawBounds(false)
 						.mount(ige);
-
+						
 					// Ask the server to create an entity for us
 					ige.network.send('playerEntity');
 				});
