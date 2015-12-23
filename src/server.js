@@ -13,6 +13,35 @@ function Server()
 		this.players = {};
 
 		ige.addComponent(IgeNetIoComponent)
+
+		// Add physics and setup physics world
+		ige.addComponent(IgeBox2dComponent)
+			.box2d.sleep(true)
+			//.box2d.gravity(0, 10)
+			.box2d.createWorld()
+			.box2d.start();
+
+		ige.box2d.contactListener(
+			// Listen for when contact's begin
+			function (contact) {
+			console.log('Contact begins between', contact.igeEntityA()._id, 'and', contact.igeEntityB()._id);
+			},
+			// Listen for when contact's end
+			function (contact) {
+			console.log('Contact ends between', contact.igeEntityA()._id, 'and', contact.igeEntityB()._id);
+			},
+			// Handle pre-solver events
+			function (contact) {
+			// For fun, lets allow ball1 and square2 to pass through each other
+			// if (contact.igeEitherId('ball1') && contact.igeEitherId('square2')) {
+			// 	// Cancel the contact
+			// 	contact.SetEnabled(false);
+			// }
+
+			// You can also check an entity by it's category using igeEitherCategory('categoryName')
+			}
+		)
+
 		// Because of the way inheritance is handled here, moving
 		// this anonymous function out is insanely hard. Good Luck :)
 		ige.network.start(this.port, function (){

@@ -4,7 +4,7 @@ function Character()
 
 	this.init = function (streamCreateData) {
 		var self = this;
-		IgeEntity.prototype.init.call(this);
+		IgeEntityBox2d.prototype.init.call(this);
 
 		this.addComponent(StatusComponent);
 
@@ -14,6 +14,24 @@ function Character()
 
 		if (ige.isServer) {
 			this.addComponent(IgeVelocityComponent);
+			this.box2dBody({
+				type: 'dynamic',
+				linearDamping: 0.0,
+				angularDampint: 0.1,
+				allowSleep:true,
+				bullet: false,
+				fixedRotation: true,
+				gravitic: true,
+				fixtures: [{
+					density: 1.0,
+					friction: 0.5,
+					restitution: 0.2,
+					shape: {
+						type: 'rectangle'
+					}
+				}]
+			})
+			this.height()
 		}
 		else // ige.isClient
 		{
@@ -93,7 +111,7 @@ function Character()
 		}
 		else
     {
-      return IgeEntity.prototype.streamSectionData.call(this, sectionId, data);
+      return IgeEntityBox2d.prototype.streamSectionData.call(this, sectionId, data);
     }
 	}
 
@@ -255,7 +273,7 @@ function Character()
 			this.depth(this._translate.y);
 		}
 
-		IgeEntity.prototype.update.call(this, ctx, tickDelta);
+		IgeEntityBox2d.prototype.update.call(this, ctx, tickDelta);
 	},
 
 	this.destroy = function () {
@@ -265,9 +283,9 @@ function Character()
 		}
 
 		// Call the super class
-		IgeEntity.prototype.destroy.call(this);
+		IgeEntityBox2d.prototype.destroy.call(this);
 	}
 }
 
-var Character = IgeEntity.extend(new Character());
+var Character = IgeEntityBox2d.extend(new Character());
 if (typeof(module) !== 'undefined' && typeof(module.exports) !== 'undefined') { module.exports = Character; }
