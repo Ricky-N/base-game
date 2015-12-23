@@ -130,13 +130,13 @@ function Controls()
 			// for now q will just drain health :)
 			if(controls.action1._active)
 			{
-				this.status.health = this.status.health - 1;
-			}
+				this.status.health(this.status.health() - 1);
+ 			}
 
-			// and e will drain power ;)
-			if(controls.action2._active)
-			{
-				this.status.power = this.status.power - 1;
+ 			// and e will drain power ;)
+ 			if(controls.action2._active)
+ 			{
+				this.status.power(this.status.power() - 1);
 			}
 		}
 		else // => ige.isClient

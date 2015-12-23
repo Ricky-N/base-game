@@ -13,9 +13,7 @@ function Character()
 		}
 		else // ige.isClient
 		{
-			streamCreateData = JSON.parse(streamCreateData);
-			this.status.health = streamCreateData.health;
-			this.status.power = streamCreateData.power;
+			this._characterStreamData(streamCreateData);
 
 			// Setup the entity
 			self.addComponent(IgeAnimationComponent)
@@ -36,10 +34,31 @@ function Character()
 		this.streamSections(['transform', 'status'])
 	}
 
+	// set should only be called from client,
+	// get should only be called from server,
+	// set basically undoes get to apply it locally
+	this._characterStreamData = function(data)
+	{
+		if(typeof data !== "undefined")
+		{
+			data = JSON.parse(data);
+			this.status.health(data.health);
+			this.status.power(data.power);
+		}
+		else
+		{
+			var data = {
+				"health": this.status.health(),
+				"power": this.status.power()
+			};
+			return JSON.stringify(data);
+		}
+	}
+
 	// Prepare data fro the client to initialize
 	this.streamCreateData = function()
 	{
-		return JSON.stringify(this.status);
+		return this._characterStreamData();
 	}
 
 	/**
@@ -59,32 +78,11 @@ function Character()
 			// if provided data, it came from server so update
 			if(data)
 			{
-				data = JSON.parse(data);
-				this.status.health = data.health;
-				this.status.power = data.power;
-
-				// TODO move to listener, callback pattern, make it
-				// only happen for player entity, etc.
-				// for now we know that 100 is the max health :/
-				var width = data.health;
-				if(data.health < 0)
-				{
-					width = 0;
-				}
-				ige.client.controlPanel.scene.children()[0].children()[0].children()[0]
-					 .applyStyle({'width': width + '%'});
-
-				var width = data.power;
-				if(data.power < 0)
-				{
-					width = 0;
-				}
-				ige.client.controlPanel.scene.children()[0].children()[0].children()[1]
-					.applyStyle({'width': width + '%'});
+				this._characterStreamData(data);
 			}
 			else // otherwise it is asking for the update
 			{
-				return JSON.stringify(this.status);
+				return this._characterStreamData();
 			}
 		}
 		else

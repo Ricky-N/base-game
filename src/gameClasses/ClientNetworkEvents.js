@@ -21,6 +21,7 @@ function initPlayer(entityId)
 	// Add the player control component and track with camera
 	ige.$(entityId).addComponent(PlayerComponent);
 	ige.client.vp1.camera.trackTranslate(ige.$(entityId), 50);
+	ige.client.controlPanel.trackStatus(ige.$(entityId));
 }
 
 var player = new ClientNetworkMessage('playerEntity', function(entityId) {

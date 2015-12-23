@@ -1,6 +1,30 @@
 function ControlPanel(mainScene)
 {
-  this.scene = new IgeScene2d()
+  var self = this;
+
+  this.trackStatus = function(player)
+  {
+    player.status.on('healthChange', function(newHealth){
+      // for now we know that 100 is the max health :/
+      var width = newHealth;
+      if(newHealth < 0)
+      {
+        width = 0;
+      }
+      self.healthBar.applyStyle({'width': width + '%'});
+    });
+
+    player.status.on('powerChange', function(newPower){
+      var width = newPower;
+      if(newPower < 0)
+      {
+        width = 0;
+      }
+      self.powerBar.applyStyle({'width': width + '%'});
+    });
+  }
+
+  self.scene = new IgeScene2d()
     .id('uiScene')
     .layer(2)
     .ignoreCamera(true)
@@ -65,17 +89,19 @@ function ControlPanel(mainScene)
     .allowFocus(false)
     .mount(controlPanel);
 
-  new IgeUiElement()
+  self.healthBar = new IgeUiElement()
     .id('healthBar')
     .styleClass('healthBar')
+    .allowFocus(false)
     .mount(statusBars);
 
-  new IgeUiElement()
+  self.powerBar = new IgeUiElement()
     .id('powerBar')
     .styleClass('powerBar')
+    .allowFocus(false)
     .mount(statusBars);
 
-  new IgeUiElement()
+  self.button = new IgeUiElement()
     .id('button')
     .styleClass('button')
     .mount(controlPanel);
