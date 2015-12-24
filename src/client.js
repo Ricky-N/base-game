@@ -40,7 +40,8 @@ function Client()
 							self.log('Stream entity created with ID: ' + entity.id());
 						});
 
-					self.mainScene = new IgeScene2d().id('mainScene');
+					self.mainScene = new IgeScene2d().id('mainScene')
+							.mouseDown(function(){console.log(ige._currentViewport.mousePos())});
 					self.background = new Background(self.mainScene);
 					self.controlPanel = new ControlPanel(self.mainScene);
 					self.foregroundScene = new IgeScene2d()
@@ -54,7 +55,7 @@ function Client()
 						.scene(self.mainScene)
 						.drawBounds(false)
 						.mount(ige);
-						
+
 					// Ask the server to create an entity for us
 					ige.network.send('playerEntity');
 				});

@@ -2,7 +2,8 @@ function Character()
 {
 	this.classId = 'Character',
 
-	this.init = function (streamCreateData) {
+	this.init = function (streamCreateData)
+	{
 		var self = this;
 		IgeEntityBox2d.prototype.init.call(this);
 
@@ -11,49 +12,43 @@ function Character()
 		// for now lets start everyone a little into the map
 		this.translate().x(400);
 		this.translate().y(350);
+		this.height(48);
+		this.width(32);
 
-		if (ige.isServer) {
+		if (ige.isServer)
+		{
 			this.addComponent(IgeVelocityComponent);
 			this.box2dBody({
 				type: 'dynamic',
 				linearDamping: 0.0,
-				angularDampint: 0.1,
+				angularDamping: 0.1,
 				allowSleep:true,
 				bullet: false,
 				fixedRotation: true,
 				gravitic: true,
 				fixtures: [{
-					density: 1.0,
-					friction: 0.5,
-					restitution: 0.2,
+					density: 1.0, friction: 0.5, restitution: 0.0,
 					shape: {
 						type: 'rectangle'
 					}
 				}]
-			})
-			this.height()
+			});
 		}
 		else // ige.isClient
 		{
+			// we should be initialized from stream, add the data
 			this._characterStreamData(streamCreateData);
+			self.addComponent(IgeAnimationComponent).depth(1);
 
-			// Setup the entity
-			self.addComponent(IgeAnimationComponent)
-				.depth(1);
-
-			// Load the character texture file
+			// TODO: improve handling of textures, animations
 			this._characterTexture = new IgeCellSheet('./textures/sprites/vx_chara02_c.png', 12, 8);
-
-			// Wait for the texture to load
 			this._characterTexture.on('loaded', function () {
-				self.texture(self._characterTexture)
-					.dimensionsFromCell();
-
-				// TODO: kind of funny, the same player may look
-				// different on different clients
+				self.texture(self._characterTexture).dimensionsFromCell();
+				// TODO: different clients see different things :/
 				self.setType(Math.floor(Math.random() * 7));
 			}, false, true);
 		}
+
 		this._lastTranslate = this._translate.clone();
 		this.streamSections(['transform', 'status'])
 	}
@@ -221,12 +216,7 @@ function Character()
 				currY = this.translate().y() * 2,
 				distX = currX - oldX,
 				distY = currY - oldY,
-				distance = Math.distance(
-					oldX,
-					oldY,
-					currX,
-					currY
-				),
+				distance = Math.distance(oldX, oldY, currX, currY),
 				speed = 0.1,
 				time = (distance / speed);
 

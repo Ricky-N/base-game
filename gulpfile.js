@@ -1,8 +1,11 @@
 /// <binding Clean='clean' ProjectOpened='watch' />
 var gulp = require("gulp"),
     jshint = require("gulp-jshint"),
-    socketServer = require("gulp-develop-server");
-    staticServer = require("gulp-webserver");
+    socketServer = require("gulp-develop-server"),
+    staticServer = require("gulp-webserver"),
+    // TODO: implement production vs dev build pipeline
+    gulpif = require("gulp-if"),
+    argv = require("yargs").argv;
 
 gulp.task("lint", ["lint:js"]);
 gulp.task("lint:js", function () {
@@ -13,6 +16,7 @@ gulp.task("lint:js", function () {
 
 gulp.task("server", ["server:socket", "server:static"]);
 gulp.task("server:socket", function(){
+  // TODO: debug mode? 
   socketServer.listen({
     path: "../ige/server/ige.js",
     args: ["-g", "./src"]

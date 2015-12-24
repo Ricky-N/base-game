@@ -21,8 +21,10 @@
   "devDependencies": {
     "gulp": "^3.9.0",
     "gulp-develop-server": "^0.5.0",
+    "gulp-if": "^2.0.0",
     "gulp-jshint": "^2.0.0",
     "gulp-webserver": "^0.9.1",
-    "jshint": "^2.8.0"
+    "jshint": "^2.8.0",
+    "yargs": "^3.31.0"
   }
 }

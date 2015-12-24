@@ -15,8 +15,9 @@ function Server()
 		ige.addComponent(IgeNetIoComponent)
 
 		// Add physics and setup physics world
-		ige.addComponent(IgeBox2dComponent)
-			.box2d.sleep(true)
+		ige.addComponent(IgeBox2dComponent);
+		ige.box2d.scaleRatio(32);
+		ige.box2d.sleep(true)
 			//.box2d.gravity(0, 10)
 			.box2d.createWorld()
 			.box2d.start();
@@ -24,11 +25,15 @@ function Server()
 		ige.box2d.contactListener(
 			// Listen for when contact's begin
 			function (contact) {
-			console.log('Contact begins between', contact.igeEntityA()._id, 'and', contact.igeEntityB()._id);
+				console.log('Contact begins between', contact.igeEntityA()._id, 'and', contact.igeEntityB()._id);
+				console.log('A_x: ' + contact.igeEntityA()._translate.x);
+				console.log('A_y: ' + contact.igeEntityA()._translate.y);
+				console.log('B_x: ' + contact.igeEntityB()._translate.x);
+				console.log('B_y: ' + contact.igeEntityB()._translate.y);
 			},
 			// Listen for when contact's end
 			function (contact) {
-			console.log('Contact ends between', contact.igeEntityA()._id, 'and', contact.igeEntityB()._id);
+				console.log('Contact ends between', contact.igeEntityA()._id, 'and', contact.igeEntityB()._id);
 			},
 			// Handle pre-solver events
 			function (contact) {
@@ -60,9 +65,7 @@ function Server()
 
 					// TODO: extend Background for server so that we can
 					// use it for collision info with things like mountains
-					self.backgroundScene = new IgeScene2d()
-						.id('backgroundScene')
-						.mount(self.mainScene);
+					self.background = new Background(self.mainScene);
 
 					self.foregroundScene = new IgeScene2d()
 						.id('foregroundScene')
