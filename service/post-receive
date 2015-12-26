@@ -1,0 +1,31 @@
+#!/bin/sh
+read oldrev newrev refname
+if [ $refname = "refs/heads/dev" ]; then
+  echo "===== DEPLOYING TO DEV SITE ====="
+  WORK_PATH="/var/www/demo.codesamplez"
+  BRANCH = "dev"
+fi
+# for now we will just leave this as is, but should probably
+# rename branches in the future for more appropriate use
+if [ $refname = "refs/heads/master" ]; then
+  echo "===== DEPLOYING TO LIVE SITE ====="
+  WORK_PATH="/home/game/base-game"
+  BRANCH = "master"
+fi
+  unset GIT_DIR
+  cd $WORK_PATH
+  umask 002
+
+  #clear any trash that might have popped up
+  git reset --hard
+
+  # update to most recent code
+  git pull --verbose origin $BRANCH || echo "git-pull: returned error code"
+
+  # update any packages that might have been added
+  npm install
+  # build for our test server
+  gulp build --test
+  forever restart /home/game/ige/server/ige.js
+
+  echo "===== DONE ====="
