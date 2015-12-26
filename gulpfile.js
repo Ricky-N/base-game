@@ -1,4 +1,3 @@
-"use strict";
 const lazyReq = require("lazy-req")(require);
 /// <binding Clean="clean" ProjectOpened="watch" />
 
