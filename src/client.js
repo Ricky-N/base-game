@@ -1,6 +1,5 @@
 function Client()
 {
-	console.log('Testing post receive');
 	this.classId = "Client";
 
 	this.init = function() {
