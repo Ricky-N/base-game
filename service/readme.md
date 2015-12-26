@@ -13,7 +13,11 @@ adduser game, do following into home/game
 git clone ige repo, npm install ige/server
 git clone base-game repo, npm install in base-game
 
-from base-game/src start the server:
-node ../../ige/server/ige.js -g .
+npm install forever -g
+drop notes.conf into etc/init/notes.conf this will trigger start and stop of the server when vm is restarted.
+
+one more problem currently, client.js code is hardcoded to point to http://localhost:2000/, needs to be updated in production to point to the right place http://gameserver.westus.cloudapp.azure.com:2000/. Will need to update there, and when updating server code will need to make sure it doesn't conflict!! :(
+
+bit TODO here to make sure this isn't a problem in the future
 
 test! :)
