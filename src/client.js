@@ -26,7 +26,8 @@ function Client()
 				// than before the scene etc are created... maybe you want
 				// a splash screen or a menu first? Then connect after you've
 				// got a username or something?
-				// TODO: connect to something a bit more generic
+				// TODO: right now build process will replace this with test server
+				// location if handed the --test flag, but we should template it better
 				ige.network.start('http://localhost:2000', function () {
 
 					// Setup the network command listeners
