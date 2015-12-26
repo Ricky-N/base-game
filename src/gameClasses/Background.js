@@ -1,14 +1,14 @@
 function Background(mainScene){
   var self = this;
   self.scene = new IgeScene2d()
-    .id('backgroundScene')
+    .id("backgroundScene")
     .layer(0)
     .mount(mainScene);
 
   if(ige.isClient)
   {
     ige.addComponent(IgeTiledComponent);
-    ige.network.request('requestMap', {}, function(commandName, data)
+    ige.network.request("requestMap", {}, function(commandName, data)
     {
       ige.tiled.loadJson(data, function(layers, layersById)
       {
@@ -16,7 +16,7 @@ function Background(mainScene){
         for(var i = 0; i < layers.length; i++)
         {
           // for now tile layers are our only visible layers
-          if(layers[i].type === 'tilelayer')
+          if(layers[i].type === "tilelayer")
           {
             layers[i].tileWidth(32)
               .tileHeight(32)
@@ -33,21 +33,21 @@ function Background(mainScene){
   else // ige.isServer
   {
     var physicsProperties = {
-      type: 'static',
+      type: "static",
       allowSleep: true,
       fixtures: [{
         shape: {
-          type: 'rectangle'
+          type: "rectangle"
         }
       }]
-    }
+    };
 
-    // we already have the Map here just load it, we don't
+    // we already have the Map here just load it, we don"t
     // care about the rendering layers only objects for box2d
     self.objects = [];
     for(var i = 0; i < Map.layers.length; i++)
     {
-      if(Map.layers[i].type === 'objectgroup')
+      if(Map.layers[i].type === "objectgroup")
       {
         var len = Map.layers[i].objects.length;
         for(var j = 0; j < len; j++)
@@ -76,6 +76,6 @@ function Background(mainScene){
   return self;
 }
 
-if (typeof(module) !== 'undefined' && typeof(module.exports) !== 'undefined') {
+if (typeof(module) !== "undefined" && typeof(module.exports) !== "undefined") {
   module.exports = Background;
 }

@@ -5,6 +5,6 @@ function Vector2d(x,y)
 	return this;
 }
 
-if (typeof(module) !== 'undefined' && typeof(module.exports) !== 'undefined') {
+if (typeof(module) !== "undefined" && typeof(module.exports) !== "undefined") {
   module.exports = Vector2d;
 }

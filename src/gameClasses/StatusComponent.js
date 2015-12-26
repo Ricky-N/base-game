@@ -1,7 +1,7 @@
 function StatusComponent()
 {
-   this.classId = 'StatusComponent';
-   this.componentId = 'status';
+   this.classId = "StatusComponent";
+   this.componentId = "status";
 
    this.init = function (entity, options) {
      var self = this;
@@ -11,20 +11,20 @@ function StatusComponent()
      // this._entity = entity;
      // // Store any options that were passed to us
      // this._options = options;
-    this.changeListeners = {}
+    this.changeListeners = {};
 
-    this.changeListeners["healthChange"] = {
+    this.changeListeners.healthChange = {
       "callbacks": [],
       "member": "_health"
-    }
+    };
     this._health = 100;
 
-    this.changeListeners["powerChange"] = {
+    this.changeListeners.powerChange = {
       "callbacks": [],
       "member": "_power"
-    }
+    };
     this._power = 100;
-  }
+  };
 
   this.on = function(changeType, callback)
   {
@@ -32,7 +32,7 @@ function StatusComponent()
     {
       this.changeListeners[changeType].callbacks.push(callback);
     }
-  }
+  };
 
   this._change = function(changeType)
   {
@@ -42,7 +42,7 @@ function StatusComponent()
     {
       listeners.callbacks[i](this[listeners.member]);
     }
-  }
+  };
 
   this.health = function(val)
   {
@@ -55,7 +55,7 @@ function StatusComponent()
     {
       return this._health;
     }
-  }
+  };
 
   this.power = function(val)
   {
@@ -68,11 +68,11 @@ function StatusComponent()
     {
       return this._power;
     }
-   }
- }
+  };
+}
 
 var StatusComponent = IgeEntity.extend(new StatusComponent());
-if (typeof(module) !== 'undefined' && typeof(module.exports) !== 'undefined')
+if (typeof(module) !== "undefined" && typeof(module.exports) !== "undefined")
 {
   module.exports = StatusComponent;
 }

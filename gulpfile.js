@@ -19,7 +19,7 @@ const gulp = require("gulp"),
 
 gulp.task("lint", ["lint:js"]);
 gulp.task("lint:js", function () {
-    return gulp.src(["./**/*.js", "!node_modules/**/**.js"])
+    return gulp.src(["src/**/*.js"])
         .pipe(jshint()(".jshintrc"))
         .pipe(jshint().reporter("default"));
 });

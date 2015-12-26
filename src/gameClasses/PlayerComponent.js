@@ -5,7 +5,7 @@ function Control()
 	this.init = function()
 	{
 		this._active = false;
-	}
+	};
 
 	this.activate = function()
 	{
@@ -14,12 +14,12 @@ function Control()
 			this._active = true;
 			this.onActivation();
 		}
-	}
+	};
 
 	this.onActivation = function()
 	{
 		throw "Must be overridden by child classes";
-	}
+	};
 
 	this.deactivate = function()
 	{
@@ -28,12 +28,12 @@ function Control()
 			this._active = false;
 			this.onDeactivation();
 		}
-	}
+	};
 
 	this.onDeactivation = function()
 	{
 		throw "Must be overridden by child classes";
-	}
+	};
 }
 var Control = IgeClass.extend(new Control());
 
@@ -46,7 +46,7 @@ function DirectionControl()
 	 Control.prototype.init.call(this);
 	 this.direction = direction;
 	 ige.input.mapAction(direction, igeKey);
- 	}
+ };
 
 	// we don't want to get in a state where the client and
 	// server are on opposite sides of the same toggle so send
@@ -61,24 +61,24 @@ function DirectionControl()
 			};
 			ige.network.send("controlUpdate", data);
 		}
-	}
+	};
 
 	this.onActivation = function()
 	{
 		this.updateFunc();
-	}
+	};
 
 	this.onDeactivation = function()
 	{
 		this.updateFunc();
-	}
+	};
 }
-var DirectionControl = Control.extend(new DirectionControl);
+var DirectionControl = Control.extend(new DirectionControl());
 
 function Controls()
 {
-	this.classId = 'PlayerComponent';
-	this.componentId = 'playerControl';
+	this.classId = "PlayerComponent";
+	this.componentId = "playerControl";
 
 	this.init = function (entity, options) {
 		var self = this;
@@ -89,18 +89,18 @@ function Controls()
 		this._options = options;
 		// DirectionControl is probably a bad name at this point
 		this.controls = {
-			left: new DirectionControl('left', ige.input.key.a),
-			right: new DirectionControl('right', ige.input.key.d),
-			up: new DirectionControl('up', ige.input.key.w),
-			down: new DirectionControl('down', ige.input.key.s),
-			action1: new DirectionControl('action1', ige.input.key.q),
-			action2: new DirectionControl('action2', ige.input.key.e)
+			left: new DirectionControl("left", ige.input.key.a),
+			right: new DirectionControl("right", ige.input.key.d),
+			up: new DirectionControl("up", ige.input.key.w),
+			down: new DirectionControl("down", ige.input.key.s),
+			action1: new DirectionControl("action1", ige.input.key.q),
+			action2: new DirectionControl("action2", ige.input.key.e)
 		};
 
 		this._speed = 0.2;
 		// Add the playerComponent behaviour to the entity
-		this._entity.addBehaviour('playerComponent_behaviour', this._behaviour);
-	}
+		this._entity.addBehaviour("playerComponent_behaviour", this._behaviour);
+	};
 
 	/**
 	 * Called every frame by the engine when this entity is mounted to the
@@ -155,10 +155,13 @@ function Controls()
 				}
 			}
 		}
-	}
+	};
 
 	return this;
-};
+}
 
 var PlayerComponent = IgeEntity.extend(new Controls());
-if (typeof(module) !== 'undefined' && typeof(module.exports) !== 'undefined') { module.exports = PlayerComponent; }
+if (typeof(module) !== "undefined" && typeof(module.exports) !== "undefined")
+{
+	module.exports = PlayerComponent;
+}
