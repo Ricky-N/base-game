@@ -22,23 +22,9 @@ function Character()
 		if (ige.isServer)
 		{
 			this.addComponent(IgeVelocityComponent);
-			this.box2dBody({
-				type: "dynamic",
-				linearDamping: 0.0,
-				angularDamping: 0.1,
-				allowSleep:true,
-				bullet: false,
-				fixedRotation: true,
-				gravitic: true,
-				fixtures: [{
-					density: 1.0, friction: 0.5, restitution: 0.0,
-					shape: {
-						type: "rectangle"
-					}
-				}]
-			});
-
-			self.skin(Math.floor(Math.random() * 7));
+			this.box2dBody(this._physicsSettings);
+			this.addComponent(AbilityComponent);
+			this.skin(Math.floor(Math.random() * 7));
 		}
 		else // ige.isClient
 		{
@@ -54,6 +40,22 @@ function Character()
 
 		this.streamSections(["transform", "status"]);
 		this._lastTranslate = this._translate.clone();
+	};
+
+	this._physicsSettings = {
+		type: "dynamic",
+		linearDamping: 0.0,
+		angularDamping: 0.1,
+		allowSleep:true,
+		bullet: false,
+		fixedRotation: true,
+		gravitic: true,
+		fixtures: [{
+			density: 1.0, friction: 0.5, restitution: 0.0,
+			shape: {
+				type: "rectangle"
+			}
+		}]
 	};
 
 	// set should only be called from client,

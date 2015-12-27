@@ -5,12 +5,7 @@ function StatusComponent()
 
    this.init = function (entity, options) {
     var self = this;
-
-    //don't care too much about these for now
-    // Store the entity that this component has been added to
     this._entity = entity;
-
-    // Store any options that were passed to us
     this._options = options;
 
     this.changeListeners = {};
@@ -76,7 +71,7 @@ function StatusComponent()
 
   this.power = function(val)
   {
-    if(val)
+    if(typeof val !== "undefined" && val !== this._power)
     {
       this._power = val;
       this._change("powerChange");
