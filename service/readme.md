@@ -10,7 +10,7 @@ drop nginx.conf into etc/nginx/nginx.conf
 nginx or "nginx -s reload" if started
 
 4. set up git repo, in admin user home folder create repositories folder,
-create symlink git to this folder this ensures tight access control, adduser git add necessary public keys to /home/git/.ssh/authorized_keys. Add bare git repo here, drop post-receive into hooks folder
+create symlink git to this folder this ensures tight access control, adduser git add necessary public keys to /home/git/.ssh/authorized_keys. Add bare git repo here, drop post-receive into hooks folder, make sure post-receive has chmod 711 so it can be executed on receive.
 
 5. adduser game, do following into home/game
 git clone ige repo, npm install ige/server
