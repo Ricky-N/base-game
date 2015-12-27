@@ -8,6 +8,10 @@ function Character()
 		IgeEntityBox2d.prototype.init.call(this);
 
 		this.addComponent(StatusComponent);
+		this.status.on("death", function(){
+			// TODO: show death animation
+			console.log("Character with id " + this.id + " has died!");
+		});
 
 		// for now lets start everyone a little into the map
 		this.translate().x(400);
@@ -84,8 +88,6 @@ function Character()
 		{
 			data = this._characterStreamData();
 			data.skin = this.skin();
-			console.log(data.skin);
-			console.log(JSON.stringify(data));
 			return JSON.stringify(data);
 		}
 	};
@@ -132,16 +134,15 @@ function Character()
 	{
 		if(typeof skin === "undefined")
 		{
-			console.log("get");
 			return this._skin;
 		}
 		else
 		{
-			console.log("set: " + skin);
 			this._skin = skin;
 
 			if(ige.isClient)
 			{
+				// TODO: move this somewhere along with the assets
 				switch (skin) {
 					case 0:
 						this.animation.define("walkDown", [1, 2, 3, 2], 8, -1)

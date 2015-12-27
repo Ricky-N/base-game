@@ -4,13 +4,15 @@ function StatusComponent()
    this.componentId = "status";
 
    this.init = function (entity, options) {
-     var self = this;
+    var self = this;
 
-    // don't care too much about these for now
-     // // Store the entity that this component has been added to
-     // this._entity = entity;
-     // // Store any options that were passed to us
-     // this._options = options;
+    //don't care too much about these for now
+    // Store the entity that this component has been added to
+    this._entity = entity;
+
+    // Store any options that were passed to us
+    this._options = options;
+
     this.changeListeners = {};
 
     this.changeListeners.healthChange = {
@@ -24,6 +26,11 @@ function StatusComponent()
       "member": "_power"
     };
     this._power = 100;
+
+    this.changeListeners.death = {
+      "callbacks": [],
+      "member": "_health"
+    };
   };
 
   this.on = function(changeType, callback)
@@ -46,10 +53,20 @@ function StatusComponent()
 
   this.health = function(val)
   {
-    if(val)
+    if(typeof val !== "undefined" && val !== this._health)
     {
-      this._health = val;
-      this._change("healthChange");
+      // only allow setting health if they aren't dead
+      if(this._health > 0)
+      {
+        this._health = val;
+        this._change("healthChange");
+
+        if(this._health <= 0)
+        {
+          this._entity.lifeSpan(1000);
+          this._change("death");
+        }
+      }
     }
     else
     {

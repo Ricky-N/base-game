@@ -67,8 +67,6 @@ gulp.task("watch", ["server"], function () {
       // TODO this is common file build pipe, refactor
       // out into reusable code.
       return gulp.src(event.path)
-        .pipe(gulpif()(yargs().argv.test,
-          replace("localhost", "gameserver.westus.cloudapp.azure.com")))
         .pipe(gulp.dest(outPath))
         .pipe(socketServer().restart(function(){
           console.log("Server restarted");
