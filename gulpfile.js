@@ -76,7 +76,7 @@ gulp.task("watch", ["server"], function () {
 
 gulp.task("pre-commit", function() {
   return guppy()(gulp).stream("pre-commit")
-    .pipe(gulpFilter()(["*.js"]))
+    .pipe(gulpFilter()(["src/*.js"]))
     .pipe(jshint()(".jshintrc"))
     .pipe(jshint().reporter("default"))
     .pipe(jshint().reporter("fail"));
