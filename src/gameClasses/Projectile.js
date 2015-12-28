@@ -11,7 +11,7 @@ function Projectile()
 
     if(ige.isServer)
     {
-      this.speed = 0.4;
+      this.speed = 0.6;
       this.height(32);
       this.width(32);
 
@@ -30,7 +30,7 @@ function Projectile()
 
       this.rotateTo(0,0,Math.atan2(direction.x, -direction.y) + Math.PI/2);
 
-      this.damage = 20;
+      this.damage = 23;
     }
     else // ige.isClient
     {

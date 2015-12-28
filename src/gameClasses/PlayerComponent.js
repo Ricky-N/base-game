@@ -283,7 +283,7 @@ function Controls()
 
 		this.toggleClickControls = new ToggleClickControlSet(entity);
 
-		this._speed = 0.2;
+		this._speed = 0.25;
 		// Add the playerComponent behaviour to the entity
 		this._entity.addBehaviour("playerComponent_behaviour", this._behaviour);
 	};
