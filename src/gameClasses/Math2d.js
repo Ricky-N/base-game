@@ -42,6 +42,11 @@ function Math2d()
     return Math.abs(1 - magnitude) < 0.001;
   };
 
+  this.pythagoras = function(v)
+  {
+    return Math.sqrt(Math.pow(v.x, 2), Math.pow(v.y, 2));
+  };
+
   this.constants = {
     NORTH: { x: 0, y: -1 },
     SOUTH: { x: 0, y: 1 },

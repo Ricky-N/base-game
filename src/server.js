@@ -22,12 +22,41 @@ function Server()
 			.box2d.createWorld()
 			.box2d.start();
 
+
+		// TODO: this doesn't feel like the right place for this anymore..
+		function handleProjectileCollision(entityA, classA, entityB, classB)
+		{
+			if(classA === "Projectile")
+			{
+				entityA.lifeSpan(75);
+				if(classB === "Character")
+				{
+					entityB.status.health(entityB.status.health() - entityA.damage);
+				}
+			}
+		}
+
+		self.tryHandleProjectileCollision = function(entityA, entityB)
+		{
+			var classA = entityA.classId();
+			var classB = entityB.classId();
+
+			handleProjectileCollision(entityA, classA, entityB, classB);
+			handleProjectileCollision(entityB, classB, entityA, classA);
+		};
+
 		ige.box2d.contactListener(
 			// Listen for when contact begin
 			function (contact) {
 				console.log("Contact begins between",
 				 	contact.igeEntityA()._id,
 					"and", contact.igeEntityB()._id);
+
+				// checks if projectile collision occurred, if so it does stuff :)
+				self.tryHandleProjectileCollision(
+					contact.igeEntityA(),
+					contact.igeEntityB()
+				);
 			},
 			// Listen for when contact end
 			function (contact) {

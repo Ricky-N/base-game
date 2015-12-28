@@ -16,15 +16,21 @@ function Character()
 		// for now lets start everyone a little into the map
 		this.translate().x(400);
 		this.translate().y(350);
-		this.height(48);
-		this.width(32);
 
 		if (ige.isServer)
 		{
+			this.height(48);
+			this.width(32);
+
 			this.addComponent(IgeVelocityComponent);
-			this.box2dBody(this._physicsSettings);
 			this.addComponent(AbilityComponent);
+			this.addComponent(PlayerComponent);
+
 			this.skin(Math.floor(Math.random() * 7));
+			this.box2dBody(this._physicsSettings);
+
+			this.mount(ige.server.foregroundScene);
+			this.streamMode(1);
 		}
 		else // ige.isClient
 		{

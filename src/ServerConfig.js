@@ -9,6 +9,7 @@ var config = {
 		{name: "Background", path: "./gameClasses/Background"},
 		{name: "ServerNetworkEvents", path: "./gameClasses/ServerNetworkEvents"},
 		{name: "StatusComponent", path: "./gameClasses/StatusComponent"},
+		{name: "Projectile", path: "./gameClasses/Projectile"},
 		{name: "AbilityComponent", path: "./gameClasses/AbilityComponent"},
 		{name: "Character", path: "./gameClasses/Character"},
 		{name: "PlayerComponent", path: "./gameClasses/PlayerComponent"}

@@ -1,3 +1,8 @@
+/**
+ * This type of control has a single state variable and is either active
+ * or inactive. If activated when it was inactive, it will call onActivation
+ * otherwise it will do nothing. Deactivation acts the same way but in reverse.
+ */
 function Control()
 {
 	this.classId = "Control";
@@ -37,6 +42,11 @@ function Control()
 }
 var Control = IgeClass.extend(new Control());
 
+/**
+ * A DirectionControl is a Control that maps from keys to the
+ * direction it will activate, and will actually tell the Server
+ * when a change in this direction happens
+ */
 function DirectionControl()
 {
 	this.classId = "DirectionControl";
@@ -56,8 +66,9 @@ function DirectionControl()
 		if(ige.isClient)
 		{
 			var data = {
-				"direction": this.direction,
-				"setting": this._active
+				"type": "Direction",
+				"control": this.direction,
+				"data": this._active
 			};
 			ige.network.send("controlUpdate", data);
 		}
@@ -75,12 +86,187 @@ function DirectionControl()
 }
 var DirectionControl = Control.extend(new DirectionControl());
 
+/**
+ * A ToggleControl is turned on first button activation, and off on the second
+ */
+function ToggleControl()
+{
+	this.classId = "ToggleControl";
+
+	this.init = function()
+	{
+		var self = this;
+		this._active = false;
+
+		this._control = new Control();
+		this._control.onActivation = function()
+		{
+			self._active = !self._active;
+			if(self._active)
+			{
+				self.onActivation();
+			}
+			else
+			{
+				self.onDeactivation();
+			}
+		};
+		this._control.onDeactivation = function(){};
+	};
+
+	// used to force reset of all state back to off while calling properly
+	this.clear = function()
+	{
+		// this will call ondeactivate for sure and onactivate if it was
+		// already in a low state.
+		this._control.activate();
+		this._control.deactivate();
+	};
+
+	this.activate = function()
+	{
+		this._control.activate();
+	};
+
+	this.deactivate = function()
+	{
+		this._control.deactivate();
+	};
+
+	this.onActivation = function()
+	{
+		throw "Must be overridden by child classes";
+	};
+
+	this.onDeactivation = function()
+	{
+		throw "Must be overridden by child classes";
+	};
+}
+var ToggleControl = IgeClass.extend(new ToggleControl());
+
+/**
+ * A ToggleClickControl is one that is activated by a button press. Once the
+ * button is pressed, the next click on screen will tell the server the desired
+ * action. If the button is pressed again, it will stop listening. Because
+ * different ToggleClickControls override each other, all of them must belong
+ * to a single ToggleClickControlSet.
+ */
+function ToggleClickControl()
+{
+	this.classId = "ToggleClickControl";
+
+	this.init = function(set, action, igeKey, serverCallback)
+	{
+		var self = this;
+		this._set = set;
+		this.action = action;
+		this.serverCallback = serverCallback;
+
+		this._control = new ToggleControl();
+		this._control.onActivation = function()
+		{
+			if(self._set.clickListener)
+			{
+				self._set.controls[self._set.clickListener].clear();
+			}
+			self._set.clickListener = self.action;
+		};
+		this._control.onDeactivation = function()
+		{
+			if(self._set.clickListener === self.action)
+			{
+				self._set.clickListener = null;
+			}
+		};
+		ige.input.mapAction(action, igeKey);
+	};
+
+	this.onToggleClick = function(event)
+	{
+		var data = {
+			"type": "ToggleClick",
+			"control": this.action,
+			"data": { x: event.x, y: event.y }
+		};
+		ige.network.send("controlUpdate", data);
+		this.clear();
+	};
+
+	this.clear = function()
+	{
+		this._control.clear();
+	};
+
+	this.activate = function()
+	{
+		this._control.activate();
+	};
+
+	this.deactivate = function()
+	{
+		this._control.deactivate();
+	};
+}
+var ToggleClickControl = IgeClass.extend(new ToggleClickControl());
+
+function ToggleClickControlSet()
+{
+	this.classId = "ToggleClickControlSet";
+
+	this.init = function(entity, options)
+	{
+		var self = this;
+		this.controls = {
+			action1: new ToggleClickControl(
+				this, "action1", ige.input.key.q,
+				ige.isServer ? entity.abilitySet.abilities[0].use : function(){}
+			),
+			action2: new ToggleClickControl(
+				this, "action2", ige.input.key.e,
+				ige.isServer ? entity.abilitySet.abilities[1].use : function(){}
+			)
+		};
+
+		this.clickListener = null;
+
+		if(ige.isClient)
+		{
+			ige.client.mainScene.mouseDown(function(){
+				if(self.clickListener)
+				{
+					self.controls[self.clickListener]
+						.onToggleClick(ige._currentViewport.mousePos());
+				}
+			});
+		}
+	};
+
+	this.checkControls = function(){
+		for(var key in this.controls)
+		{
+			if(this.controls.hasOwnProperty(key)){
+				if(ige.input.actionState(this.controls[key].action))
+				{
+					this.controls[key].activate();
+				}
+				else
+				{
+					this.controls[key].deactivate();
+				}
+			}
+		}
+	};
+}
+var ToggleClickControlSet = IgeClass.extend(new ToggleClickControlSet());
+
 function Controls()
 {
 	this.classId = "PlayerComponent";
 	this.componentId = "playerControl";
 
-	this.init = function (entity, options) {
+	this.init = function (entity, options)
+	{
 		var self = this;
 
 		// Store the entity that this component has been added to
@@ -92,10 +278,10 @@ function Controls()
 			left: new DirectionControl("left", ige.input.key.a),
 			right: new DirectionControl("right", ige.input.key.d),
 			up: new DirectionControl("up", ige.input.key.w),
-			down: new DirectionControl("down", ige.input.key.s),
-			action1: new DirectionControl("action1", ige.input.key.q),
-			action2: new DirectionControl("action2", ige.input.key.e)
+			down: new DirectionControl("down", ige.input.key.s)
 		};
+
+		this.toggleClickControls = new ToggleClickControlSet(entity);
 
 		this._speed = 0.2;
 		// Add the playerComponent behaviour to the entity
@@ -126,21 +312,11 @@ function Controls()
 			var vel = Math2d.scale(norm, speed);
 			this.velocity.x(vel.x);
 			this.velocity.y(vel.y);
-
-			// for now q will just drain health :)
-			if(controls.action1._active)
-			{
-				this.abilitySet.abilities[0].use();
- 			}
-
- 			// and e will drain power ;)
- 			if(controls.action2._active)
- 			{
-				this.abilitySet.abilities[1].use();
-			}
 		}
 		else // => ige.isClient
 		{
+			this.playerControl.toggleClickControls.checkControls();
+
 			for(var key in controls)
 			{
 				if(controls.hasOwnProperty(key)){

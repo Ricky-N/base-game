@@ -36,10 +36,7 @@ ServerNetworkEvents.incoming.push(playerDisconnect);
 
 var playerEntity = new ServerNetworkMessage("playerEntity", function(data, clientId){
 	if (!ige.server.players[clientId]) {
-		ige.server.players[clientId] = new Character(clientId)
-			.addComponent(PlayerComponent)
-			.streamMode(1)
-			.mount(ige.server.foregroundScene);
+		ige.server.players[clientId] = new Character(clientId);
 
 		// Tell the client to track their player entity
 		ige.network.send("playerEntity", ige.server.players[clientId].id(), clientId);
@@ -48,8 +45,20 @@ var playerEntity = new ServerNetworkMessage("playerEntity", function(data, clien
 ServerNetworkEvents.incoming.push(playerEntity);
 
 var controlUpdate = new ServerNetworkMessage("controlUpdate", function(data, clientId){
-	var controls = ige.server.players[clientId].playerControl.controls;
-	controls[data.direction]._active = data.setting;
+	// TODO: switch
+	var controls;
+	if(data.type === "Direction")
+	{
+		controls = ige.server.players[clientId].playerControl.controls;
+		controls[data.control]._active = data.data;
+	}
+	else if(data.type === "ToggleClick")
+	{
+		// we don't want to clog up behaviour loops with an event that should be
+		// relatively rare, so handle the event directly here async to ticks
+		controls = ige.server.players[clientId].playerControl.toggleClickControls.controls;
+		controls[data.control].serverCallback(data.data);
+	}
 });
 ServerNetworkEvents.incoming.push(controlUpdate);
 

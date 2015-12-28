@@ -8,24 +8,29 @@ function StatusComponent()
     this._entity = entity;
     this._options = options;
 
-    this.changeListeners = {};
+    this._healthRegen = 0.5; // per second
+    this._powerRegen = 1; // per second
 
+    this.changeListeners = {};
     this.changeListeners.healthChange = {
       "callbacks": [],
       "member": "_health"
     };
     this._health = 100;
-
+    this._maxHealth = 100;
     this.changeListeners.powerChange = {
       "callbacks": [],
       "member": "_power"
     };
     this._power = 100;
-
+    this._maxPower = 100;
     this.changeListeners.death = {
       "callbacks": [],
       "member": "_health"
     };
+
+    // Add the statusComponent behaviour to the entity
+    this._entity.addBehaviour("statusComponent_behaviour", this._behaviour);
   };
 
   this.on = function(changeType, callback)
@@ -81,6 +86,35 @@ function StatusComponent()
       return this._power;
     }
   };
+
+  this._lastUpdateSecond = -1;
+  this._behaviour = function (ctx) {
+
+    if(ige.isServer)
+    {
+      // if we are pretty close to a second boundary, recalc
+      var second = ige.lastTick >> 10;
+      if(second !== this.status._lastUpdateSecond)
+      {
+        var self = this.status;
+        self._lastUpdateSecond = second;
+
+        self._health += self._healthRegen;
+        if(self._health > self._maxHealth)
+        {
+          self._health = self._maxHealth;
+        }
+
+        self._power += self._powerRegen;
+        if(self._power > self._maxPower)
+        {
+          self._power = self._maxPower;
+        }
+      }
+    }
+  };
+
+  return this;
 }
 
 var StatusComponent = IgeEntity.extend(new StatusComponent());
