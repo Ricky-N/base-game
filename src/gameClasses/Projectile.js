@@ -1,84 +1,68 @@
-// TODO: HUUUGEEEEE PERF PROBLEM CREATING AND DESTROYING THESE,
-// WE NEED A PRECREATED POOL OF ENTITIES TO DRAW FROM
+// TODO: Perf problems creating and destroying these, make an initialized
+// entity pool to deal with projectiles instead
 function Projectile()
 {
   this.classId = "Projectile";
 
-  this.init = function(createInfo)
+  // on server create is passed from new Projectile(create),
+  // on client it comes from this.streamCreateData
+  this.init = function(create)
   {
     var self = this;
     IgeEntityBox2d.prototype.init.call(this);
 
     if(ige.isServer)
     {
-      // TODO clean up this hack.
-      this.projectileType = createInfo.type;
-      if(createInfo.type === "small")
-      {
-        this.classId("SmallProjectile");
-        this.speed = 0.7;
-        this.height(10);
-        this.width(10);
-        this.damage = 3;
-      }
-      else
-      {
-        this.speed = 0.5;
-        this.height(32);
-        this.width(32);
-        this.damage = 23;
-      }
+      this.speed = create.speed;
+      this.height(create.height);
+      this.width(create.width);
+      this.damage = create.damage;
+      this.category = create.category;
 
-      this.translate().x(createInfo.position.x);
-      this.translate().y(createInfo.position.y);
+      this.translate().x(create.position.x);
+      this.translate().y(create.position.y);
 
       this.addComponent(IgeVelocityComponent);
       this.mount(ige.server.foregroundScene);
       this.box2dBody(this._physicsSettings);
       this.streamMode(1);
 
-      var direction = createInfo.direction;
+      var direction = create.direction;
       var vel = Math2d.scale(direction, this.speed);
       this.velocity.x(vel.x);
       this.velocity.y(vel.y);
 
-      this.rotateTo(0,0,Math.atan2(direction.x, -direction.y) + Math.PI/2);
+      this.cellRow = create.cellRow;
+      this.cellCol = create.cellCol;
+
+      var rotation = Math.atan2(direction.x, -direction.y) + Math.PI/2;
+      this.rotateTo(0,0, rotation);
     }
     else // ige.isClient
     {
-      this.projectileType = JSON.parse(createInfo).projectileType;
+      create = JSON.parse(create);
+      this.cellRow = create.cellRow;
+      this.cellCol = create.cellCol;
+
       // TODO: load this with the character, also this cell sheet has white space!!
+      // for now, all projectiles live on the same cell sheet
       this._projectileTexture = new IgeCellSheet("./textures/tiles/tilee5.png", 16, 16);
       this._projectileTexture.on("loaded", function () {
         self.texture(self._projectileTexture);
-        if(self.projectileType === "small")
-        {
-          self.cell(6 * 16 + 4);
-        }
-        else
-        {
-          self.cell(13 * 16 + 4);
-        }
-        //self.dimensionsFromCell();
+        self.cell(self.cellRow * 16 + self.cellCol);
       }, false, true);
-
-      ige.client.projectile = this;
     }
 
-    if(this.ProjectileType === "small")
-    {
-      // for now projectiles only live for 1 seconds!
-      this.lifeSpan(500);
-    }
-    else
-    {
-      this.lifeSpan(1300);
-    }
+    this.lifeSpan(create.lifeSpan);
   };
 
   this.streamCreateData = function()
   {
-    return JSON.stringify({projectileType: this.projectileType});
+    return JSON.stringify({
+      cellRow: this.cellRow,
+      cellCol: this.cellCol,
+      lifeSpan: this.lifeSpan()
+    });
   };
 
   this._physicsSettings = {
@@ -107,8 +91,8 @@ function Projectile()
     IgeEntityBox2d.prototype.destroy.call(this);
   };
 }
-
 var Projectile = IgeEntityBox2d.extend(new Projectile());
+
 if (typeof(module) !== "undefined" && typeof(module.exports) !== "undefined")
 {
 	module.exports = Projectile;

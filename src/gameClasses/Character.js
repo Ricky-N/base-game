@@ -21,6 +21,7 @@ function Character()
 		{
 			this.height(48);
 			this.width(32);
+			this._speed = 0.18
 
 			this.addComponent(IgeVelocityComponent);
 			this.addComponent(AbilityComponent);

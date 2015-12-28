@@ -88,10 +88,11 @@ function AbilityComponent()
       // var bounds = self._entity.bounds2d();
       // var minSafeDistance = Math2d.pythagoras(bounds) + 5;
       // //Math2d.scale(norm, minSafeDistance));
-      var projectilePosition = Math2d.add(entityPosition, Math2d.scale(norm, 50));
+      var pos = Math2d.add(entityPosition, Math2d.scale(norm, 50));
       new Projectile({
-        position: projectilePosition,
-        direction: norm
+        position: pos, direction: norm, category: "large",
+        speed: 0.5, height: 32, width: 32, damage: 23,
+        lifeSpan: 900, cellRow: 13, cellCol: 4
       });
     };
     this.abilities[0].useCost = function()
@@ -143,15 +144,15 @@ function AbilityComponent()
       // var bounds = self._entity.bounds2d();
       // var minSafeDistance = Math2d.pythagoras(bounds) + 5;
       // //Math2d.scale(norm, minSafeDistance));
-      var projectilePosition = Math2d.add(entityPosition, Math2d.scale(norm, 50));
+      var pos = Math2d.add(entityPosition, Math2d.scale(norm, 50));
       new Projectile({
-        position: projectilePosition,
-        direction: norm,
-        type: "small"
+        position: pos, direction: norm, category: "small",
+        speed: 0.7, height: 10, width: 10, damage: 3,
+        lifeSpan: 500, cellRow: 6, cellCol: 4
       });
     };
     this.abilities[2].useCost = function(){ return true; };
-    this.abilities[2].cooldown = 700;
+    this.abilities[2].cooldown = 1000;
   };
 }
 

@@ -307,7 +307,6 @@ function Controls()
 			});
 		}
 
-		this._speed = 0.25;
 		// Add the playerComponent behaviour to the entity
 		this._entity.addBehaviour("playerComponent_behaviour", this._behaviour);
 	};
@@ -317,33 +316,29 @@ function Controls()
 	 * scenegraph.
 	 * @param ctx The canvas context to render to.
 	 */
-	this._behaviour = function (ctx) {
+	this._behaviour = function (ctx)
+	{
 		var controls = this.playerControl.controls;
-
 		if (ige.isServer)
 		{
-			var speed = this.playerControl._speed;
-
 			// set up control precedents
-			var x = controls.left._active ? -1 :
-						  controls.right._active ? 1 : 0;
-			var y = controls.up._active ? -1 :
-							controls.down._active ? 1 : 0;
+			var x = controls.left._active ? -1 : (controls.right._active ? 1 : 0);
+			var y = controls.up._active ? -1 : (controls.down._active ? 1 : 0);
 
 			// we want the character to move the same speed no matter
 			// which direction they are going, so normalize and multiply by speed
 			var norm = Math2d.normalize(new Vector2d(x,y));
-			var vel = Math2d.scale(norm, speed);
+			var vel = Math2d.scale(norm, this._speed);
 			this.velocity.x(vel.x);
 			this.velocity.y(vel.y);
 		}
 		else // => ige.isClient
 		{
 			this.playerControl.toggleClickControls.checkControls();
-
 			for(var key in controls)
 			{
-				if(controls.hasOwnProperty(key)){
+				if(controls.hasOwnProperty(key))
+				{
 				  if(ige.input.actionState(controls[key].direction))
 					{
 						controls[key].activate();
