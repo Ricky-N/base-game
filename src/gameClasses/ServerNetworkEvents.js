@@ -59,6 +59,10 @@ var controlUpdate = new ServerNetworkMessage("controlUpdate", function(data, cli
 		controls = ige.server.players[clientId].playerControl.toggleClickControls.controls;
 		controls[data.control].serverCallback(data.data);
 	}
+	else if(data.type === "Click")
+	{
+		ige.server.players[clientId].abilitySet.abilities[2].use(data.data);
+	}
 });
 ServerNetworkEvents.incoming.push(controlUpdate);
 

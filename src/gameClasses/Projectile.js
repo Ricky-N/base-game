@@ -11,9 +11,23 @@ function Projectile()
 
     if(ige.isServer)
     {
-      this.speed = 0.6;
-      this.height(32);
-      this.width(32);
+      // TODO clean up this hack.
+      this.projectileType = createInfo.type;
+      if(createInfo.type === "small")
+      {
+        this.classId("SmallProjectile");
+        this.speed = 0.7;
+        this.height(10);
+        this.width(10);
+        this.damage = 3;
+      }
+      else
+      {
+        this.speed = 0.5;
+        this.height(32);
+        this.width(32);
+        this.damage = 23;
+      }
 
       this.translate().x(createInfo.position.x);
       this.translate().y(createInfo.position.y);
@@ -29,24 +43,42 @@ function Projectile()
       this.velocity.y(vel.y);
 
       this.rotateTo(0,0,Math.atan2(direction.x, -direction.y) + Math.PI/2);
-
-      this.damage = 23;
     }
     else // ige.isClient
     {
+      this.projectileType = JSON.parse(createInfo).projectileType;
       // TODO: load this with the character, also this cell sheet has white space!!
       this._projectileTexture = new IgeCellSheet("./textures/tiles/tilee5.png", 16, 16);
       this._projectileTexture.on("loaded", function () {
-        self.texture(self._projectileTexture)
-          .cell(13 * 16 + 4)
-          .dimensionsFromCell();
+        self.texture(self._projectileTexture);
+        if(self.projectileType === "small")
+        {
+          self.cell(6 * 16 + 4);
+        }
+        else
+        {
+          self.cell(13 * 16 + 4);
+        }
+        //self.dimensionsFromCell();
       }, false, true);
 
       ige.client.projectile = this;
     }
 
-    // for now projectiles only live for 1 seconds!
-    this.lifeSpan(1000);
+    if(this.ProjectileType === "small")
+    {
+      // for now projectiles only live for 1 seconds!
+      this.lifeSpan(500);
+    }
+    else
+    {
+      this.lifeSpan(1300);
+    }
+  };
+
+  this.streamCreateData = function()
+  {
+    return JSON.stringify({projectileType: this.projectileType});
   };
 
   this._physicsSettings = {

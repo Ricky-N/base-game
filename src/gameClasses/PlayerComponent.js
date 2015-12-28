@@ -229,20 +229,23 @@ function ToggleClickControlSet()
 		};
 
 		this.clickListener = null;
+	};
 
-		if(ige.isClient)
+	this.triggerClick = function(event)
+	{
+		if(this.clickListener)
 		{
-			ige.client.mainScene.mouseDown(function(){
-				if(self.clickListener)
-				{
-					self.controls[self.clickListener]
-						.onToggleClick(ige._currentViewport.mousePos());
-				}
-			});
+			this.controls[this.clickListener].onToggleClick(event);
 		}
 	};
 
-	this.checkControls = function(){
+	this.hasActiveControl = function()
+	{
+		return this.clickListener !== null;
+	};
+
+	this.checkControls = function()
+	{
 		for(var key in this.controls)
 		{
 			if(this.controls.hasOwnProperty(key)){
@@ -282,6 +285,27 @@ function Controls()
 		};
 
 		this.toggleClickControls = new ToggleClickControlSet(entity);
+
+		if(ige.isClient)
+		{
+			ige.client.mainScene.mouseDown(function()
+			{
+				var event = ige._currentViewport.mousePos();
+				if(self.toggleClickControls.hasActiveControl())
+				{
+					self.toggleClickControls.triggerClick(event);
+				}
+				else
+				{
+					// if none of the toggleClickControls are active, we can use this click event
+					var data = {
+						"type": "Click",
+						"data": { x: event.x, y: event.y }
+					};
+					ige.network.send("controlUpdate", data);
+				}
+			});
+		}
 
 		this._speed = 0.25;
 		// Add the playerComponent behaviour to the entity

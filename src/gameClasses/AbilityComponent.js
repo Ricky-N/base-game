@@ -1,7 +1,7 @@
 function Ability()
 {
   var self = this;
-  self.cooldown = 500; // ms
+  self.cooldown = 2000; // ms
   self._lastUsed = 0; // ticks
   self._onCooldown = true;
 
@@ -124,6 +124,34 @@ function AbilityComponent()
       }
       return false;
     };
+
+    // auto attack
+    this.abilities[2] = new Ability();
+    this.abilities[2].onUse = function(point)
+    {
+      // TODO clean!!!
+      var entityPosition = self._entity.worldPosition();
+
+      // get the vector pointing from entity to clicked point
+      var direction = Math2d.subtract(point, entityPosition);
+      var norm = Math2d.normalize(direction);
+
+      // we don't want the projectile to overlap our entity, so place it starting
+      // at closest distance we can, which is basically the straight line distance
+      // to the entity of the corner's bounding box plus one
+      // TODO: cache this!!!!
+      // var bounds = self._entity.bounds2d();
+      // var minSafeDistance = Math2d.pythagoras(bounds) + 5;
+      // //Math2d.scale(norm, minSafeDistance));
+      var projectilePosition = Math2d.add(entityPosition, Math2d.scale(norm, 50));
+      new Projectile({
+        position: projectilePosition,
+        direction: norm,
+        type: "small"
+      });
+    };
+    this.abilities[2].useCost = function(){ return true; };
+    this.abilities[2].cooldown = 700;
   };
 }
 
