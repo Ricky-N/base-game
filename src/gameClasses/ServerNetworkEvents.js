@@ -37,9 +37,16 @@ ServerNetworkEvents.incoming.push(playerDisconnect);
 var playerEntity = new ServerNetworkMessage("playerEntity", function(data, clientId){
 	if (!ige.server.players[clientId]) {
 		ige.server.players[clientId] = new Character(clientId);
+		var controlMetadata = ige.server.players[clientId].abilitySet.getControlMetadata();
+		ige.server.players[clientId].addComponent(PlayerComponent, controlMetadata);
 
+		var returnData = {
+			id: ige.server.players[clientId].id(),
+			controlMetadata: controlMetadata
+		};
+		
 		// Tell the client to track their player entity
-		ige.network.send("playerEntity", ige.server.players[clientId].id(), clientId);
+		ige.network.send("playerEntity", returnData, clientId);
 	}
 });
 ServerNetworkEvents.incoming.push(playerEntity);
@@ -47,9 +54,14 @@ ServerNetworkEvents.incoming.push(playerEntity);
 var controlUpdate = new ServerNetworkMessage("controlUpdate", function(data, clientId){
 	// TODO: switch
 	var controls;
-	if(data.type === "Direction")
+	if(data.type === "Press")
 	{
-		controls = ige.server.players[clientId].playerControl.controls;
+		controls = ige.server.players[clientId].playerControl.pressControls;
+		controls[data.control]._active = data.data;
+	}
+	else if(data.type === "Direction")
+	{
+		controls = ige.server.players[clientId].playerControl.directionControls;
 		controls[data.control]._active = data.data;
 	}
 	else if(data.type === "ToggleClick")
@@ -57,11 +69,11 @@ var controlUpdate = new ServerNetworkMessage("controlUpdate", function(data, cli
 		// we don't want to clog up behaviour loops with an event that should be
 		// relatively rare, so handle the event directly here async to ticks
 		controls = ige.server.players[clientId].playerControl.toggleClickControls.controls;
-		controls[data.control].serverCallback(data.data);
+		controls[data.control].ability.use(data.data);
 	}
 	else if(data.type === "Click")
 	{
-		ige.server.players[clientId].abilitySet.abilities[2].use(data.data);
+		ige.server.players[clientId].abilitySet.autoAttack.use(data.data);
 	}
 });
 ServerNetworkEvents.incoming.push(controlUpdate);

@@ -48,9 +48,9 @@ function Server()
 		ige.box2d.contactListener(
 			// Listen for when contact begin
 			function (contact) {
-				console.log("Contact begins between",
-				 	contact.igeEntityA()._id,
-					"and", contact.igeEntityB()._id);
+				// console.log("Contact begins between",
+				//  	contact.igeEntityA()._id,
+				// 	"and", contact.igeEntityB()._id);
 
 				// checks if projectile collision occurred, if so it does stuff :)
 				self.tryHandleProjectileCollision(
@@ -60,9 +60,9 @@ function Server()
 			},
 			// Listen for when contact end
 			function (contact) {
-				console.log("Contact ends between",
-					contact.igeEntityA()._id,
-					"and", contact.igeEntityB()._id);
+				// console.log("Contact ends between",
+				// 	contact.igeEntityA()._id,
+				// 	"and", contact.igeEntityB()._id);
 			},
 			// Handle pre-solver events
 			function (contact) {

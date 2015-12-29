@@ -21,11 +21,10 @@ function Character()
 		{
 			this.height(48);
 			this.width(32);
-			this._speed = 0.18
+			this._speed = 0.18;
 
 			this.addComponent(IgeVelocityComponent);
 			this.addComponent(AbilityComponent);
-			this.addComponent(PlayerComponent);
 
 			this.skin(Math.floor(Math.random() * 7));
 			this.box2dBody(this._physicsSettings);
@@ -35,7 +34,7 @@ function Character()
 		}
 		else // ige.isClient
 		{
-			self.addComponent(IgeAnimationComponent).depth(1);
+			this.addComponent(IgeAnimationComponent).depth(1);
 			// TODO: improve handling of textures, animations
 			this._characterTexture = new IgeCellSheet("./textures/sprites/vx_chara02_c.png", 12, 8);
 			this._characterTexture.on("loaded", function () {

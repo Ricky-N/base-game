@@ -43,20 +43,22 @@ function Control()
 var Control = IgeClass.extend(new Control());
 
 /**
- * A DirectionControl is a Control that maps from keys to the
- * direction it will activate, and will actually tell the Server
- * when a change in this direction happens
+ * A PressControl is a Control that is pressed to try to use the
+ * assigned action for the duration of time it is pressed, and released
+ * to do nothing. When pressed it is on.
  */
-function DirectionControl()
+function PressControl()
 {
-	this.classId = "DirectionControl";
+	this.classId = "PressControl";
 
-	this.init = function(direction, igeKey)
+	this.init = function(action, key, ability, networkVerb)
 	{
-	 Control.prototype.init.call(this);
-	 this.direction = direction;
-	 ige.input.mapAction(direction, igeKey);
- };
+		Control.prototype.init.call(this);
+		this.action = action;
+		ige.input.mapAction(action, key);
+		this.ability = ability;
+		this.networkVerb = networkVerb ? networkVerb : "Press";
+ 	};
 
 	// we don't want to get in a state where the client and
 	// server are on opposite sides of the same toggle so send
@@ -66,8 +68,8 @@ function DirectionControl()
 		if(ige.isClient)
 		{
 			var data = {
-				"type": "Direction",
-				"control": this.direction,
+				"type": this.networkVerb,
+				"control": this.action,
 				"data": this._active
 			};
 			ige.network.send("controlUpdate", data);
@@ -84,7 +86,7 @@ function DirectionControl()
 		this.updateFunc();
 	};
 }
-var DirectionControl = Control.extend(new DirectionControl());
+var PressControl = Control.extend(new PressControl());
 
 /**
  * A ToggleControl is turned on first button activation, and off on the second
@@ -156,12 +158,12 @@ function ToggleClickControl()
 {
 	this.classId = "ToggleClickControl";
 
-	this.init = function(set, action, igeKey, serverCallback)
+	this.init = function(set, action, igeKey, ability)
 	{
 		var self = this;
 		this._set = set;
 		this.action = action;
-		this.serverCallback = serverCallback;
+		this.ability = ability;
 
 		this._control = new ToggleControl();
 		this._control.onActivation = function()
@@ -210,6 +212,24 @@ function ToggleClickControl()
 }
 var ToggleClickControl = IgeClass.extend(new ToggleClickControl());
 
+// common helper method to activate control if pressed
+function checkControls(controls)
+{
+	for(var key in controls)
+	{
+		if(controls.hasOwnProperty(key)){
+			if(ige.input.actionState(controls[key].action))
+			{
+				controls[key].activate();
+			}
+			else
+			{
+				controls[key].deactivate();
+			}
+		}
+	}
+}
+
 function ToggleClickControlSet()
 {
 	this.classId = "ToggleClickControlSet";
@@ -217,18 +237,15 @@ function ToggleClickControlSet()
 	this.init = function(entity, options)
 	{
 		var self = this;
-		this.controls = {
-			action1: new ToggleClickControl(
-				this, "action1", ige.input.key.q,
-				ige.isServer ? entity.abilitySet.abilities[0].use : function(){}
-			),
-			action2: new ToggleClickControl(
-				this, "action2", ige.input.key.e,
-				ige.isServer ? entity.abilitySet.abilities[1].use : function(){}
-			)
-		};
-
+		this.controls = {};
 		this.clickListener = null;
+	};
+
+	this.addControl = function(name, key, ability)
+	{
+		this.controls[name] = new ToggleClickControl(
+			this, name, key, ability
+		);
 	};
 
 	this.triggerClick = function(event)
@@ -246,19 +263,7 @@ function ToggleClickControlSet()
 
 	this.checkControls = function()
 	{
-		for(var key in this.controls)
-		{
-			if(this.controls.hasOwnProperty(key)){
-				if(ige.input.actionState(this.controls[key].action))
-				{
-					this.controls[key].activate();
-				}
-				else
-				{
-					this.controls[key].deactivate();
-				}
-			}
-		}
+		checkControls(this.controls);
 	};
 }
 var ToggleClickControlSet = IgeClass.extend(new ToggleClickControlSet());
@@ -268,23 +273,29 @@ function Controls()
 	this.classId = "PlayerComponent";
 	this.componentId = "playerControl";
 
-	this.init = function (entity, options)
+	this.init = function (entity, controlMetadata)
 	{
 		var self = this;
-
-		// Store the entity that this component has been added to
 		this._entity = entity;
-		// Store any options that were passed to us
-		this._options = options;
-		// DirectionControl is probably a bad name at this point
-		this.controls = {
-			left: new DirectionControl("left", ige.input.key.a),
-			right: new DirectionControl("right", ige.input.key.d),
-			up: new DirectionControl("up", ige.input.key.w),
-			down: new DirectionControl("down", ige.input.key.s)
+
+		// each player has a fixed number of abilities, this will map from
+		// ability index in their abilitySet abilities to key that controls it
+		// TODO: variable player config, not static mapping
+		this.abilityIndexToControl = [
+			{ name: "action1", key: ige.input.key.q },
+			{ name: "action2", key: ige.input.key.e }
+		];
+
+		this.directionControls = {
+			left: new PressControl("left", ige.input.key.a, {}, "Direction"),
+			right: new PressControl("right", ige.input.key.d, {}, "Direction"),
+			up: new PressControl("up", ige.input.key.w, {}, "Direction"),
+			down: new PressControl("down", ige.input.key.s, {}, "Direction")
 		};
 
+		this.pressControls = {};
 		this.toggleClickControls = new ToggleClickControlSet(entity);
+		this.addAbilityControls(controlMetadata);
 
 		if(ige.isClient)
 		{
@@ -311,6 +322,31 @@ function Controls()
 		this._entity.addBehaviour("playerComponent_behaviour", this._behaviour);
 	};
 
+	this.addAbilityControls = function(abilityControls)
+	{
+		for(var i = 0; i < abilityControls.length; i++)
+		{
+			// TODO: do we need a switch?
+			if(abilityControls[i] === "ToggleClickControl")
+			{
+				this.toggleClickControls.addControl(
+					this.abilityIndexToControl[i].name,
+					this.abilityIndexToControl[i].key,
+					ige.isServer ? this._entity.abilitySet.abilities[i] : {}
+				);
+			}
+			else if(abilityControls[i] === "PressControl")
+			{
+				this.pressControls[this.abilityIndexToControl[i].name] =
+					new PressControl(
+						this.abilityIndexToControl[i].name,
+						this.abilityIndexToControl[i].key,
+						ige.isServer ? this._entity.abilitySet.abilities[i] : {}
+					);
+			}
+		}
+	};
+
 	/**
 	 * Called every frame by the engine when this entity is mounted to the
 	 * scenegraph.
@@ -318,10 +354,12 @@ function Controls()
 	 */
 	this._behaviour = function (ctx)
 	{
-		var controls = this.playerControl.controls;
 		if (ige.isServer)
 		{
-			// set up control precedents
+			// Direction controls are a special case because there is a slightly
+			// complex relationship between the different controls that we need
+			// to handle as efficiently as possible, so we set them aside
+			var controls = this.playerControl.directionControls;
 			var x = controls.left._active ? -1 : (controls.right._active ? 1 : 0);
 			var y = controls.up._active ? -1 : (controls.down._active ? 1 : 0);
 
@@ -331,24 +369,21 @@ function Controls()
 			var vel = Math2d.scale(norm, this._speed);
 			this.velocity.x(vel.x);
 			this.velocity.y(vel.y);
+
+			controls = this.playerControl.pressControls;
+			for(var key in controls)
+			{
+				if(controls.hasOwnProperty(key) && controls[key]._active)
+				{
+					controls[key].ability.use();
+				}
+			}
 		}
 		else // => ige.isClient
 		{
 			this.playerControl.toggleClickControls.checkControls();
-			for(var key in controls)
-			{
-				if(controls.hasOwnProperty(key))
-				{
-				  if(ige.input.actionState(controls[key].direction))
-					{
-						controls[key].activate();
-					}
-					else
-					{
-						controls[key].deactivate();
-					}
-				}
-			}
+			checkControls(this.playerControl.directionControls);
+			checkControls(this.playerControl.pressControls);
 		}
 	};
 
