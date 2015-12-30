@@ -52,6 +52,11 @@ var player = new ClientNetworkMessage("playerEntity", function(response) {
 // not exactly sure why this is required, but new inside the push fails :/
 ClientNetworkEvents.incoming.push(player);
 
+var activate = new ClientNetworkMessage("activate", function(response) {
+	ige.$(response).activate();
+});
+ClientNetworkEvents.incoming.push(activate);
+
 if (typeof(module) !== "undefined" && typeof(module.exports) !== "undefined")
 {
 	module.exports = ClientNetworkEvents;

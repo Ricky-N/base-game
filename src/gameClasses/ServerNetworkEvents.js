@@ -44,7 +44,7 @@ var playerEntity = new ServerNetworkMessage("playerEntity", function(data, clien
 			id: ige.server.players[clientId].id(),
 			controlMetadata: controlMetadata
 		};
-		
+
 		// Tell the client to track their player entity
 		ige.network.send("playerEntity", returnData, clientId);
 	}
@@ -85,6 +85,11 @@ var requestMap = new ServerNetworkMessage("requestMap", function(data, clientId,
 	ige.network.response(requestId, Map);
 });
 ServerNetworkEvents.incoming.push(requestMap);
+
+var activate = new ServerNetworkMessage("activate", function(response){
+	//console.log('This is a bunch of bullshit, client will never send this!!!');
+});
+ServerNetworkEvents.incoming.push(activate);
 
 if (typeof(module) !== "undefined" && typeof(module.exports) !== "undefined")
 {

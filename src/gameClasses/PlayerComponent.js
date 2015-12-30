@@ -376,8 +376,18 @@ function Controls()
 
 				// we want the character to move the same speed no matter
 				// which direction they are going, so normalize and multiply by speed
-				var norm = Math2d.normalize(new Vector2d(x,y));
-				var vel = Math2d.scale(norm, this._speed);
+				var vel, controlVec = new Vector2d(x,y);
+				if(!Math2d.equals(Math2d.constants.STATIONARY, controlVec))
+				{
+					var norm = Math2d.normalize(controlVec);
+					vel = Math2d.scale(norm, this._speed);
+				}
+				else
+				{
+					vel = controlVec;
+				}
+				// TODO: do we need velocity component when we have box2d? 
+				//this._box2dBody.SetLinearVelocity(vel);
 				this.velocity.x(vel.x);
 				this.velocity.y(vel.y);
 			}

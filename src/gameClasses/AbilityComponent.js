@@ -189,69 +189,20 @@ function AbilityComponent()
 
     this.autoAttack = new Ability(entity, 1500);
     this.autoAttack.useCost = function(){ return true; };
-    this._attacking = false;
-    this._charactersInAttackRange = {};
+    // this._attacking = false;
+    // this._charactersInAttackRange = {};
+    var pos = { x: entity.translate().x(), y: entity.translate().y() };
+    this.attackField = new DamageField({
+      parentId: entity.id(),
+      activeSpan: 300,
+      damage: 10,
+      position: { x: pos.x, y: pos.y }
+    });
+    entity.followingChildren.push(this.attackField);
     this.autoAttack.onUse = function(point)
     {
-      // // TODO: this seems pretty common, refactor in some way
-      // var entityPosition = self._entity.worldPosition();
-      // var direction = Math2d.subtract(point, entityPosition);
-      // var norm = Math2d.normalize(direction);
-      // var pos = Math2d.add(entityPosition, Math2d.scale(norm, 150));
-      for(var id in self._charactersInAttackRange)
-      {
-        if(self._charactersInAttackRange.hasOwnProperty(id))
-        {
-          var status = ige.$(id).status;
-          status.health(status.health() - 10);
-        }
-      }
-      //self._charactersInAttackRange = {};
-
-      self._attacking = true;
-      setInterval(function()
-      {
-        self._attacking = false;
-      }, 300);
+      self.attackField.activate();
     };
-
-    this.characterEnteredAttackRange = function(id)
-    {
-      if(this._attacking)
-      {
-        var status = ige.$(id).status;
-        status.health(status.health() - 10);
-      }
-      else
-      {
-        this._charactersInAttackRange[id] = true;
-      }
-    };
-
-    this.characterLeftAttackRange = function(id)
-    {
-      delete this._charactersInAttackRange[id];
-    };
-
-    var B2CircleShape = Box2D.Collision.Shapes.b2CircleShape;
-    var B2Vec2 = Box2D.Common.Math.b2Vec2;
-    var B2FixtureDef = Box2D.Dynamics.b2FixtureDef;
-    var scaleRatio = 32;//self._entity.box2d._scaleRatio;
-
-    var tempShape = new B2CircleShape();
-    tempShape.SetRadius((64 / scaleRatio));
-    var finalX = 0;
-    var finalY = 0;
-    tempShape.SetLocalPosition(new B2Vec2(finalX / scaleRatio, finalY / scaleRatio));
-
-    tempFixture = new B2FixtureDef();
-    tempFixture.shape = tempShape;
-    tempFixture.isSensor = true;
-    tempFixture.type = "AutoAttack";
-    tempFixture.filter.categoryBits = 2;
-    tempFixture.filter.maskBits = 1;
-
-    self._entity._box2dBody.CreateFixture(tempFixture);
   };
 
   this.getControlMetadata = function()

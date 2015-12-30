@@ -47,34 +47,22 @@ function Server()
 
 		ige.box2d.contactListener(
 			// Listen for when contact begin
-			function (contact) {
-				// console.log(contact.m_fixtureA.m_filter.categoryBits);
-				// console.log(contact.m_fixtureB.m_filter.categoryBits);
-				var categoryA = contact.m_fixtureA.m_filter.categoryBits;
-				var categoryB = contact.m_fixtureB.m_filter.categoryBits;
-
-				// check if it was a damaging fixture
-				if(categoryA === 2)
+			function (contact)
+			{
+				if(contact.igeEntityA().classId() === "DamageField" &&
+					 contact.igeEntityB().classId() === "Character")
 				{
-					if(contact.igeEntityA().classId() === "Character" &&
-						 contact.igeEntityB().classId() === "Character")
-					{
-						contact.igeEntityA().abilitySet.characterEnteredAttackRange(
-							contact.igeEntityB()._id
-						);
-					}
+					contact.igeEntityA().characterEnteredRange(
+						contact.igeEntityB()._id
+					);
 				}
 
-				// check if it was a damaging fixture
-				if(categoryB === 2)
+				if(contact.igeEntityB().classId() === "DamageField" &&
+					 contact.igeEntityA().classId() === "Character")
 				{
-					if(contact.igeEntityB().classId() === "Character" &&
-						 contact.igeEntityA().classId() === "Character")
-					{
-						contact.igeEntityB().abilitySet.characterEnteredAttackRange(
-							contact.igeEntityA()._id
-						);
-					}
+					contact.igeEntityB().characterEnteredRange(
+						contact.igeEntityA()._id
+					);
 				}
 
 				// checks if projectile collision occurred, if so it does stuff :)
@@ -84,35 +72,22 @@ function Server()
 				);
 			},
 			// Listen for when contact end
-			function (contact) {
-				// console.log("Contact ends between",
-				// 	contact.igeEntityA()._id,
-				// 	"and", contact.igeEntityB()._id);
-				// check if it was a damaging fixture
-				var categoryA = contact.m_fixtureA.m_filter.categoryBits;
-				var categoryB = contact.m_fixtureB.m_filter.categoryBits;
-
-				if(categoryA === 2)
+			function (contact)
+			{
+				if(contact.igeEntityA().classId() === "DamageField" &&
+					 contact.igeEntityB().classId() === "Character")
 				{
-					if(contact.igeEntityA().classId() === "Character" &&
-						 contact.igeEntityB().classId() === "Character")
-					{
-						contact.igeEntityA().abilitySet.characterLeftAttackRange(
-							contact.igeEntityB()._id
-						);
-					}
+					contact.igeEntityA().characterLeftRange(
+						contact.igeEntityB()._id
+					);
 				}
 
-				// check if it was a damaging fixture
-				if(categoryB === 2)
+				if(contact.igeEntityB().classId() === "DamageField" &&
+					 contact.igeEntityA().classId() === "Character")
 				{
-					if(contact.igeEntityB().classId() === "Character" &&
-						 contact.igeEntityA().classId() === "Character")
-					{
-						contact.igeEntityB().abilitySet.characterLeftAttackRange(
-							contact.igeEntityA()._id
-						);
-					}
+					contact.igeEntityB().characterLeftRange(
+						contact.igeEntityA()._id
+					);
 				}
 			},
 			// Handle pre-solver events

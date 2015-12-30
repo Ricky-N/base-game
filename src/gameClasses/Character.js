@@ -13,6 +13,12 @@ function Character()
 			console.log("Character with id " + this.id + " has died!");
 		});
 
+		// Store the existing transform methods
+		this._translateToProtoChar = this.translateTo;
+		// Take over the transform methods
+		this.translateTo = this._translateToChar;
+		this.followingChildren = [];
+
 		// for now lets start everyone a little into the map
 		this.translate().x(400);
 		this.translate().y(350);
@@ -23,9 +29,10 @@ function Character()
 			this.width(32);
 			this._speed = 0.18;
 
+			this.addComponent(AbilityComponent);
+
 			this.box2dBody(this._physicsSettings);
 			this.addComponent(IgeVelocityComponent);
-			this.addComponent(AbilityComponent);
 
 			this.skin(Math.floor(Math.random() * 7));
 
@@ -46,6 +53,24 @@ function Character()
 
 		this.streamSections(["transform", "status"]);
 		this._lastTranslate = this._translate.clone();
+	};
+
+	this._translateToChar = function (x, y, z) {
+		// Call the original method
+		this._translateToProtoChar(x, y, z);
+
+		// if we have any following children, move them as well
+		if (this.followingChildren.length) {
+			var translate = this._translate;
+			for(var i = 0; i < this.followingChildren.length; i++)
+			{
+				this.followingChildren[i].translateTo(
+					translate.x, translate.y, translate.z
+				);
+			}
+		}
+
+		return this;
 	};
 
 	this._physicsSettings = {

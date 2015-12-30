@@ -4,6 +4,7 @@ var igeClientConfig = {
 		"./gameClasses/ClientNetworkEvents.js",
 		"./gameClasses/StatusComponent.js",
 		"./gameClasses/Projectile.js",
+		"./gameClasses/DamageField.js",
 		"./gameClasses/AbilityComponent.js",
 		"./gameClasses/Character.js",
 		"./gameClasses/PlayerComponent.js",
