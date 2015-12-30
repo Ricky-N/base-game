@@ -1,6 +1,8 @@
 function Ability()
 {
   this.classId = "Ability";
+  this.controlType = "PressControl";
+
   this.init = function(entity, cooldown, costType, cost)
   {
     this.cooldown = cooldown; // ms
@@ -78,6 +80,7 @@ var AbilityCostFunctions = {
 function ProjectileAbility()
 {
   this.classId = "ProjectileAbility";
+  this.controlType = "ToggleClickControl";
 
   this.init = function(entity, cooldown, costType, cost)
   {
@@ -115,17 +118,12 @@ function ProjectileAbility()
 }
 var ProjectileAbility = Ability.extend(new ProjectileAbility());
 
-var AbilityToControlType = {
-  "ProjectileAbility": "ToggleClickControl",
-  "Ability": "PressControl"
-};
-
 function getControlMetadata(abilitySet)
 {
   var ret = [];
   for(var i = 0; i < abilitySet.abilities.length; i++)
   {
-    ret.push(AbilityToControlType[abilitySet.abilities[i].classId()]);
+    ret.push(abilitySet.abilities[i].controlType);
   }
   return ret;
 }
@@ -149,23 +147,111 @@ function AbilityComponent()
       damage: 23, lifeSpan: 900, cellRow: 13, cellCol: 4
     };
 
-    // heal 30% of missing health
-    this.abilities[1] = new Ability(entity, 2000, "power", 20);
-    // because this ability is linked to a toggleclickcontrol
-    // we will receive a point with it where they clicked
-    this.abilities[1].onUse = function()
+    // // heal 30% of missing health
+    // this.abilities[1] = new Ability(entity, 2000, "power", 20);
+    // // because this ability is linked to a toggleclickcontrol
+    // // we will receive a point with it where they clicked
+    // this.abilities[1].onUse = function()
+    // {
+    //   var status = self._entity.status;
+    //   status.health(status.health() + 0.30 * (100 - status.health()));
+    // };
+
+    // TODO there is something wrong with this!!! it sometimes won't dash
+    this.abilities[1] = new Ability(entity, 3500, "power", 15);
+    this.abilities[1].controlType = "ToggleClickControl";
+    this.abilities[1].onUse = function(point)
     {
-      var status = self._entity.status;
-      status.health(status.health() + 0.30 * (100 - status.health()));
+      // TODO: this seems pretty common, refactor in some way
+      var entityPosition = self._entity.worldPosition();
+      var direction = Math2d.subtract(point, entityPosition);
+      var norm = Math2d.normalize(direction);
+      var velocity = Math2d.scale(norm, 20);
+
+      self._entity.status._movementEnabled = false;
+      self._entity.status._dashing = true;
+      self._entity._box2dBody.SetLinearVelocity(velocity);
+      setTimeout(function()
+      {
+  			self._entity.status._movementEnabled = true;
+        self._entity.status._dashing = false;
+        self._entity._box2dBody.SetLinearVelocity(new Vector2d(0,0));
+      }, 300);
     };
 
-    this.autoAttack = new ProjectileAbility(entity, 1000);
-    this.autoAttack.projectileInfo = {
-      category: "small", speed: 0.7, height: 10, width: 10,
-      damage: 3, lifeSpan: 500, cellRow: 6, cellCol: 4
-    };
-    // costs nothing, lets make it explicit and efficient
+    // this.autoAttack = new ProjectileAbility(entity, 1000);
+    // this.autoAttack.projectileInfo = {
+    //   category: "small", speed: 0.7, height: 10, width: 10,
+    //   damage: 3, lifeSpan: 500, cellRow: 6, cellCol: 4
+    // };
+    // // costs nothing, lets make it explicit and efficient
+    // this.autoAttack.useCost = function(){ return true; };
+
+    this.autoAttack = new Ability(entity, 1500);
     this.autoAttack.useCost = function(){ return true; };
+    this._attacking = false;
+    this._charactersInAttackRange = {};
+    this.autoAttack.onUse = function(point)
+    {
+      // // TODO: this seems pretty common, refactor in some way
+      // var entityPosition = self._entity.worldPosition();
+      // var direction = Math2d.subtract(point, entityPosition);
+      // var norm = Math2d.normalize(direction);
+      // var pos = Math2d.add(entityPosition, Math2d.scale(norm, 150));
+      for(var id in self._charactersInAttackRange)
+      {
+        if(self._charactersInAttackRange.hasOwnProperty(id))
+        {
+          var status = ige.$(id).status;
+          status.health(status.health() - 10);
+        }
+      }
+      //self._charactersInAttackRange = {};
+
+      self._attacking = true;
+      setInterval(function()
+      {
+        self._attacking = false;
+      }, 300);
+    };
+
+    this.characterEnteredAttackRange = function(id)
+    {
+      if(this._attacking)
+      {
+        var status = ige.$(id).status;
+        status.health(status.health() - 10);
+      }
+      else
+      {
+        this._charactersInAttackRange[id] = true;
+      }
+    };
+
+    this.characterLeftAttackRange = function(id)
+    {
+      delete this._charactersInAttackRange[id];
+    };
+
+    var B2CircleShape = Box2D.Collision.Shapes.b2CircleShape;
+    var B2Vec2 = Box2D.Common.Math.b2Vec2;
+    var B2FixtureDef = Box2D.Dynamics.b2FixtureDef;
+    var scaleRatio = 32;//self._entity.box2d._scaleRatio;
+
+    var tempShape = new B2CircleShape();
+    tempShape.SetRadius((64 / scaleRatio));
+    var finalX = 0;
+    var finalY = 0;
+    tempShape.SetLocalPosition(new B2Vec2(finalX / scaleRatio, finalY / scaleRatio));
+
+    tempFixture = new B2FixtureDef();
+    tempFixture.shape = tempShape;
+    tempFixture.isSensor = true;
+    tempFixture.type = "AutoAttack";
+    tempFixture.filter.categoryBits = 2;
+    tempFixture.filter.maskBits = 1;
+
+    self._entity._box2dBody.CreateFixture(tempFixture);
   };
 
   this.getControlMetadata = function()

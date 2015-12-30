@@ -67,6 +67,7 @@ function Background(mainScene){
   					.mount(self.scene)
   					.box2dBody(physicsProperties);
 
+          obj.isStatic = true;
           self.objects.push(obj);
         }
       }

@@ -77,6 +77,10 @@ function Projectile()
       density: 1.0, friction: 0.5, restitution: 0.0,
       shape: {
         type: "rectangle"
+      },
+      filter: {
+        categoryBits: 4,
+        maskBits: 5
       }
     }]
   };

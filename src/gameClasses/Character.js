@@ -23,11 +23,11 @@ function Character()
 			this.width(32);
 			this._speed = 0.18;
 
+			this.box2dBody(this._physicsSettings);
 			this.addComponent(IgeVelocityComponent);
 			this.addComponent(AbilityComponent);
 
 			this.skin(Math.floor(Math.random() * 7));
-			this.box2dBody(this._physicsSettings);
 
 			this.mount(ige.server.foregroundScene);
 			this.streamMode(1);
@@ -50,7 +50,7 @@ function Character()
 
 	this._physicsSettings = {
 		type: "dynamic",
-		linearDamping: 0.0,
+		linearDamping: 2,
 		angularDamping: 0.1,
 		allowSleep:true,
 		bullet: false,

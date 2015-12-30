@@ -356,27 +356,30 @@ function Controls()
 	{
 		if (ige.isServer)
 		{
-			// Direction controls are a special case because there is a slightly
-			// complex relationship between the different controls that we need
-			// to handle as efficiently as possible, so we set them aside
-			var controls = this.playerControl.directionControls;
-			var x = controls.left._active ? -1 : (controls.right._active ? 1 : 0);
-			var y = controls.up._active ? -1 : (controls.down._active ? 1 : 0);
-
-			// we want the character to move the same speed no matter
-			// which direction they are going, so normalize and multiply by speed
-			var norm = Math2d.normalize(new Vector2d(x,y));
-			var vel = Math2d.scale(norm, this._speed);
-			this.velocity.x(vel.x);
-			this.velocity.y(vel.y);
-
-			controls = this.playerControl.pressControls;
+			var controls = this.playerControl.pressControls;
 			for(var key in controls)
 			{
 				if(controls.hasOwnProperty(key) && controls[key]._active)
 				{
 					controls[key].ability.use();
 				}
+			}
+
+			if(this.status._movementEnabled)
+			{
+				// Direction controls are a special case because there is a slightly
+				// complex relationship between the different controls that we need
+				// to handle as efficiently as possible, so we set them aside
+				controls = this.playerControl.directionControls;
+				var x = controls.left._active ? -1 : (controls.right._active ? 1 : 0);
+				var y = controls.up._active ? -1 : (controls.down._active ? 1 : 0);
+
+				// we want the character to move the same speed no matter
+				// which direction they are going, so normalize and multiply by speed
+				var norm = Math2d.normalize(new Vector2d(x,y));
+				var vel = Math2d.scale(norm, this._speed);
+				this.velocity.x(vel.x);
+				this.velocity.y(vel.y);
 			}
 		}
 		else // => ige.isClient

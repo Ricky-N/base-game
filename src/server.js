@@ -48,9 +48,34 @@ function Server()
 		ige.box2d.contactListener(
 			// Listen for when contact begin
 			function (contact) {
-				// console.log("Contact begins between",
-				//  	contact.igeEntityA()._id,
-				// 	"and", contact.igeEntityB()._id);
+				// console.log(contact.m_fixtureA.m_filter.categoryBits);
+				// console.log(contact.m_fixtureB.m_filter.categoryBits);
+				var categoryA = contact.m_fixtureA.m_filter.categoryBits;
+				var categoryB = contact.m_fixtureB.m_filter.categoryBits;
+
+				// check if it was a damaging fixture
+				if(categoryA === 2)
+				{
+					if(contact.igeEntityA().classId() === "Character" &&
+						 contact.igeEntityB().classId() === "Character")
+					{
+						contact.igeEntityA().abilitySet.characterEnteredAttackRange(
+							contact.igeEntityB()._id
+						);
+					}
+				}
+
+				// check if it was a damaging fixture
+				if(categoryB === 2)
+				{
+					if(contact.igeEntityB().classId() === "Character" &&
+						 contact.igeEntityA().classId() === "Character")
+					{
+						contact.igeEntityB().abilitySet.characterEnteredAttackRange(
+							contact.igeEntityA()._id
+						);
+					}
+				}
 
 				// checks if projectile collision occurred, if so it does stuff :)
 				self.tryHandleProjectileCollision(
@@ -63,6 +88,32 @@ function Server()
 				// console.log("Contact ends between",
 				// 	contact.igeEntityA()._id,
 				// 	"and", contact.igeEntityB()._id);
+				// check if it was a damaging fixture
+				var categoryA = contact.m_fixtureA.m_filter.categoryBits;
+				var categoryB = contact.m_fixtureB.m_filter.categoryBits;
+
+				if(categoryA === 2)
+				{
+					if(contact.igeEntityA().classId() === "Character" &&
+						 contact.igeEntityB().classId() === "Character")
+					{
+						contact.igeEntityA().abilitySet.characterLeftAttackRange(
+							contact.igeEntityB()._id
+						);
+					}
+				}
+
+				// check if it was a damaging fixture
+				if(categoryB === 2)
+				{
+					if(contact.igeEntityB().classId() === "Character" &&
+						 contact.igeEntityA().classId() === "Character")
+					{
+						contact.igeEntityB().abilitySet.characterLeftAttackRange(
+							contact.igeEntityA()._id
+						);
+					}
+				}
 			},
 			// Handle pre-solver events
 			function (contact) {
