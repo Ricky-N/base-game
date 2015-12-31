@@ -86,8 +86,9 @@ function DamageField()
     });
   };
 
-  this.activate = function()
+  this.activate = function(position)
   {
+    var self = this;
     if(ige.isServer)
     {
       ige.network.send("activate", this.id());
@@ -101,7 +102,6 @@ function DamageField()
         }
       }
 
-      var self = this;
       setInterval(function()
       {
         self.deactivate();
@@ -109,7 +109,9 @@ function DamageField()
     }
     else
     {
-      this.animation.start("play");
+      setTimeout(function(){
+        self.animation.start("play");
+      }, ige.client.renderLatency);
     }
   };
 

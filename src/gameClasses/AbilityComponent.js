@@ -204,12 +204,28 @@ function Spikes(entity)
     position: { x: pos.x, y: pos.y }
   });
   entity.followingChildren.push(auto.attackField);
-  var self = auto;
   auto.onUse = function(point)
   {
-    self.attackField.activate();
+    auto.attackField.activate();
   };
   return auto;
+}
+
+function Explosion(entity)
+{
+  var explosion = new Ability("explosion", entity, 2000, "power", 20);
+  var pos = { x: entity.translate().x(), y: entity.translate().y };
+  explosion.explosionField = new DamageField({
+    activeSpan: 300,
+    damage: 15,
+    position: { x: 0, y: 0 } // ?? lol
+  });
+  explosion.onUse = function(point)
+  {
+    explosion.explosionField.translateTo(point.x, point.y, 0);
+    explosion.explosionField.activate();
+  };
+  return explosion;
 }
 
 var optionMapping = {
@@ -217,7 +233,8 @@ var optionMapping = {
   "spikes": Spikes,
   "heal": Heal,
   "rocks": Rocks,
-  "dash": Dash
+  "dash": Dash,
+  "explosion": Explosion
 };
 
 // AbilityComponent is server side only because we don't want every

@@ -12,6 +12,7 @@ function Client()
 		ige.createFrontBuffer(true);
 
 		ige.sheetManager = new SheetManager();
+		this.renderLatency = 100;
 
 		// TODO better object here!
 		this.players = [];
@@ -36,7 +37,7 @@ function Client()
 
 					// Setup the network stream handler, log when we get new things
 					ige.network.addComponent(IgeStreamComponent)
-						.stream.renderLatency(100)
+						.stream.renderLatency(self.renderLatency)
 						.stream.on("entityCreated", function (entity) {
 							self.players.push(entity);
 							self.log("Stream entity created with ID: " + entity.id());
