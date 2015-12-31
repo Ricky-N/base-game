@@ -66,7 +66,7 @@ function Projectile()
   };
 
   this._physicsSettings = {
-    type: "kinematic",
+    type: "dynamic",
     linearDamping: 0.0,
     angularDamping: 0.1,
     allowSleep:true,
