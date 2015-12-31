@@ -9,7 +9,7 @@ function StatusComponent()
     this._options = options;
 
     this._healthRegen = 0.5; // per second
-    this._powerRegen = 1.3; // per second
+    this._powerRegen = 2; // per second
 
     this._movementEnabled = true;
     this._dashing = false;
