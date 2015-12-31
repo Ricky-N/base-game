@@ -11,6 +11,8 @@ function Client()
 		ige.addComponent(IgeNetIoComponent);
 		ige.createFrontBuffer(true);
 
+		ige.sheetManager = new SheetManager();
+
 		// TODO better object here!
 		this.players = [];
 

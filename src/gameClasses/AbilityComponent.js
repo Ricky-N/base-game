@@ -121,25 +121,17 @@ function ProjectileAbility()
 }
 var ProjectileAbility = Ability.extend(new ProjectileAbility());
 
-function getControlMetadata(abilitySet)
-{
-  var ret = [];
-  for(var i = 0; i < abilitySet.abilities.length; i++)
-  {
-    ret.push({
-      name: abilitySet.abilities[i].name,
-      controlType: abilitySet.abilities[i].controlType
-    });
-  }
-  return ret;
-}
-
 function Daggers(entity)
 {
   var daggers = new ProjectileAbility("daggers", entity, 2000, "power", 10);
   daggers.projectileInfo = {
     category: "large", speed: 0.5, height: 32, width: 32,
     damage: 23, lifeSpan: 900, cellRow: 13, cellCol: 4
+  };
+  daggers.cellSheetInfo = {
+    sheet: "./textures/tiles/tilee5.png",
+    columns: 16,
+    rows: 16,
   };
   return daggers;
 }
@@ -192,8 +184,11 @@ function Rocks(entity)
     category: "small", speed: 0.7, height: 10, width: 10,
     damage: 6, lifeSpan: 500, cellRow: 6, cellCol: 4
   };
-  // costs nothing, lets make it explicit and efficient
-  // auto.useCost = function(){ return true; };
+  auto.cellSheetInfo = {
+    sheet: "./textures/tiles/tilee5.png",
+    columns: 16,
+    rows: 16,
+  };
   return auto;
 }
 
@@ -242,10 +237,10 @@ function AbilityComponent()
     // we have to be very careful about the input here, which comes
     // directly from clients for now, so that we don't screw it up.
     var defaults = ["rocks", "daggers", "heal", "dash"];
-    var abilityChoices = [];
+    var abilityChoices = [], i;
     if(options.abilities)
     {
-      for(var i = 0; i < 4; i++)
+      for(i = 0; i < 4; i++)
       {
         if(options.abilities[i] &&
              optionMapping.hasOwnProperty(options.abilities[i]))
@@ -264,7 +259,7 @@ function AbilityComponent()
     }
 
     this.abilities = [];
-    for(var i = 0; i < abilityChoices.length; i++)
+    for(i = 0; i < abilityChoices.length; i++)
     {
       this.abilities[i] = new optionMapping[abilityChoices[i]](entity);
     }
@@ -272,7 +267,31 @@ function AbilityComponent()
 
   this.getControlMetadata = function()
   {
-    return getControlMetadata(this);
+    var ret = [];
+    for(var i = 0; i < this.abilities.length; i++)
+    {
+      ret.push({
+        name: this.abilities[i].name,
+        controlType: this.abilities[i].controlType
+      });
+    }
+    return ret;
+  };
+
+  // for things like projectiles we don't want to create a new
+  // cell sheet every time the projectile is created, but we also
+  // don't have a client side abilitySet to hold the reference
+  this.getCellSheetInfo = function()
+  {
+    var cellSheetInfo = [];
+    for(var i = 0; i < this.abilities.length; i++)
+    {
+      if(typeof this.abilities[i].cellSheetInfo !== "undefined")
+      {
+        cellSheetInfo.push(this.abilities[i].cellSheetInfo);
+      }
+    }
+    return cellSheetInfo;
   };
 }
 

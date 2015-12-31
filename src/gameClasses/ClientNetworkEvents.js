@@ -19,7 +19,6 @@ var ClientNetworkEvents = {
 function initPlayer(entityId, controlMetadata)
 {
 	// Add the player control component and track with camera
-	console.log(controlMetadata);
 	var player = ige.$(entityId);
 	player.addComponent(PlayerComponent, controlMetadata);
 	// have the camera follow the player

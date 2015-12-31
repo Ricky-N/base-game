@@ -2,7 +2,7 @@ function Character()
 {
 	this.classId = "Character",
 
-	this.init = function (streamCreateData)
+	this.init = function (createData)
 	{
 		var self = this;
 		IgeEntityBox2d.prototype.init.call(this);
@@ -29,7 +29,12 @@ function Character()
 			this.width(32);
 			this._speed = 0.18;
 
-			this.addComponent(AbilityComponent, streamCreateData);
+			this.addComponent(AbilityComponent, createData);
+			// get information destined for the client about what
+			// textures are required to display these abilities. This
+			// is required as we don't have a client side AbilityComponent
+			// so that it is almost completely shielded enemies do.
+			this.abilitySheetInfo = this.abilitySet.getCellSheetInfo();
 
 			this.box2dBody(this._physicsSettings);
 			this.addComponent(IgeVelocityComponent);
@@ -42,13 +47,18 @@ function Character()
 		else // ige.isClient
 		{
 			this.addComponent(IgeAnimationComponent).depth(1);
-			// TODO: improve handling of textures, animations
-			this._characterTexture = new IgeCellSheet("./textures/sprites/vx_chara02_c.png", 12, 8);
-			this._characterTexture.on("loaded", function () {
-				self.texture(self._characterTexture).dimensionsFromCell();
-				// load the rest of the pertinent character information
-				self.streamCreateData(streamCreateData);
-			}, false, true);
+
+			ige.sheetManager.registerCallback(
+				"./textures/sprites/vx_chara02_c.png", function(texture){
+					self.texture(texture).dimensionsFromCell();
+					// load the rest of the pertinent character information
+					self.streamCreateData(createData);
+					for(var i = 0; i < self.abilitySheetInfo.length; i++)
+					{
+						var info = self.abilitySheetInfo[i];
+						ige.sheetManager.loadSheet(info.sheet, info.columns, info.rows);
+					}
+				}, 12, 8);
 		}
 
 		this.streamSections(["transform", "status"]);
@@ -116,11 +126,14 @@ function Character()
 			data = JSON.parse(data);
 			this.skin(data.skin);
 			this._characterStreamData(data);
+			this.abilitySheetInfo = data.abilitySheetInfo;
 		}
 		else
 		{
 			data = this._characterStreamData();
 			data.skin = this.skin();
+			data.abilitySheetInfo = this.abilitySheetInfo;
+
 			return JSON.stringify(data);
 		}
 	};

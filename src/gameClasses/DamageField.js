@@ -35,21 +35,24 @@ function DamageField()
     else // ige.isClient
     {
       this.addComponent(IgeAnimationComponent).depth(1);
-      this._fieldTexture = new IgeCellSheet("./textures/tiles/spikes.png", 1, 4);
-      this._fieldTexture.on("loaded", function () {
-				self.texture(self._fieldTexture).dimensionsFromCell();
-        self.animation.define("play", [1, 2, 3, 4, 3, 2, 1], 21, 0);
-        self.hide();
+      var managedTexture = ige.sheetManager.registerCallback(
+        "./textures/tiles/spikes.png", function(texture){
+          self.texture(texture);
+          self.cell(self.cellRow * 16 + self.cellCol);
 
-        self.animation.on("started", function(anim)
-        {
-          self.show();
-        });
-        self.animation.on("complete", function(anim)
-        {
+          self.texture(texture).dimensionsFromCell();
+          self.animation.define("play", [1, 2, 3, 4, 3, 2, 1], 21, 0);
           self.hide();
-        });
-			}, false, true);
+
+          self.animation.on("started", function(anim)
+          {
+            self.show();
+          });
+          self.animation.on("complete", function(anim)
+          {
+            self.hide();
+          });
+        }, 1, 4);
     }
   };
 

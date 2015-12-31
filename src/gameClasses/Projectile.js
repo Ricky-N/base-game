@@ -46,11 +46,27 @@ function Projectile()
 
       // TODO: load this with the character, also this cell sheet has white space!!
       // for now, all projectiles live on the same cell sheet
-      this._projectileTexture = new IgeCellSheet("./textures/tiles/tilee5.png", 16, 16);
-      this._projectileTexture.on("loaded", function () {
-        self.texture(self._projectileTexture);
-        self.cell(self.cellRow * 16 + self.cellCol);
-      }, false, true);
+      var managedTexture = ige.sheetManager.registerCallback(
+        "./textures/tiles/tilee5.png", function(texture){
+          self.texture(texture);
+          self.cell(self.cellRow * 16 + self.cellCol);
+        }
+      );
+
+      // this._projectileTexture = managedTexture.sheet;
+      // var onLoaded = function () {
+      //   self.texture(self._projectileTexture);
+      //   self.cell(self.cellRow * 16 + self.cellCol);
+      // }
+      //
+      // if(managedTexture.loaded)
+      // {
+      //   onLoaded();
+      // }
+      // else
+      // {
+      //   this._projectileTexture.on("loaded", onLoaded, false, true);
+      // }
     }
 
     this.lifeSpan(create.lifeSpan);
