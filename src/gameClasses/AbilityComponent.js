@@ -3,8 +3,9 @@ function Ability()
   this.classId = "Ability";
   this.controlType = "PressControl";
 
-  this.init = function(entity, cooldown, costType, cost)
+  this.init = function(name, entity, cooldown, costType, cost)
   {
+    this.name = name;
     this.cooldown = cooldown; // ms
     this._lastUsed = 0; // ticks
     this._onCooldown = false;
@@ -42,7 +43,9 @@ function Ability()
       this._onCooldown = true;
       this._lastUsed = ige.lastTick;
       this.onUse(arg);
+      return this.cooldown;
     }
+    // TODO: we should maybe return some failure status code?
   };
 
   /**
@@ -82,9 +85,9 @@ function ProjectileAbility()
   this.classId = "ProjectileAbility";
   this.controlType = "ToggleClickControl";
 
-  this.init = function(entity, cooldown, costType, cost)
+  this.init = function(name, entity, cooldown, costType, cost)
   {
-    Ability.prototype.init.call(this, entity, cooldown, costType, cost);
+    Ability.prototype.init.call(this, name, entity, cooldown, costType, cost);
   };
 
   this.onUse = function(point)
@@ -123,11 +126,17 @@ function getControlMetadata(abilitySet)
   var ret = [];
   for(var i = 0; i < abilitySet.abilities.length; i++)
   {
-    ret.push(abilitySet.abilities[i].controlType);
+    ret.push({
+      name: abilitySet.abilities[i].name,
+      controlType: abilitySet.abilities[i].controlType
+    });
   }
   return ret;
 }
 
+// AbilityComponent is server side only because we don't want every
+// player to be able to see every other player's abilities or ability
+// metadata. Instead we just send it on character init to only that player
 function AbilityComponent()
 {
    this.classId = "AbilityComponent";
@@ -141,7 +150,7 @@ function AbilityComponent()
 
     // players have a fixed number of abilities
     this.abilities = [];
-    this.abilities[0] = new ProjectileAbility(entity, 2000, "power", 10);
+    this.abilities[0] = new ProjectileAbility("daggers", entity, 2000, "power", 10);
     this.abilities[0].projectileInfo = {
       category: "large", speed: 0.5, height: 32, width: 32,
       damage: 23, lifeSpan: 900, cellRow: 13, cellCol: 4
@@ -158,7 +167,7 @@ function AbilityComponent()
     // };
 
     // TODO there is something wrong with this!!! it sometimes won't dash
-    this.abilities[1] = new Ability(entity, 3500, "power", 15);
+    this.abilities[1] = new Ability("dash", entity, 3500, "power", 15);
     this.abilities[1].controlType = "ToggleClickControl";
     this.abilities[1].onUse = function(point)
     {
@@ -179,7 +188,7 @@ function AbilityComponent()
       }, 300);
     };
 
-    // this.autoAttack = new ProjectileAbility(entity, 1000);
+    // this.autoAttack = new ProjectileAbility("ranged-auto", entity, 1000);
     // this.autoAttack.projectileInfo = {
     //   category: "small", speed: 0.7, height: 10, width: 10,
     //   damage: 3, lifeSpan: 500, cellRow: 6, cellCol: 4
@@ -187,11 +196,11 @@ function AbilityComponent()
     // // costs nothing, lets make it explicit and efficient
     // this.autoAttack.useCost = function(){ return true; };
 
-    this.autoAttack = new Ability(entity, 1500);
+    this.autoAttack = new Ability("melee-auto", entity, 1500);
     this.autoAttack.useCost = function(){ return true; };
     // this._attacking = false;
     // this._charactersInAttackRange = {};
-    var pos = { x: entity.translate().x(), y: entity.translate().y() };
+    var pos = { x: entity.translate().x(), y: entity.translate().y };
     this.attackField = new DamageField({
       parentId: entity.id(),
       activeSpan: 300,

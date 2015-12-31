@@ -327,7 +327,7 @@ function Controls()
 		for(var i = 0; i < abilityControls.length; i++)
 		{
 			// TODO: do we need a switch?
-			if(abilityControls[i] === "ToggleClickControl")
+			if(abilityControls[i].controlType === "ToggleClickControl")
 			{
 				this.toggleClickControls.addControl(
 					this.abilityIndexToControl[i].name,
@@ -335,7 +335,7 @@ function Controls()
 					ige.isServer ? this._entity.abilitySet.abilities[i] : {}
 				);
 			}
-			else if(abilityControls[i] === "PressControl")
+			else if(abilityControls[i].controlType === "PressControl")
 			{
 				this.pressControls[this.abilityIndexToControl[i].name] =
 					new PressControl(
@@ -386,7 +386,7 @@ function Controls()
 				{
 					vel = controlVec;
 				}
-				// TODO: do we need velocity component when we have box2d? 
+				// TODO: do we need velocity component when we have box2d?
 				//this._box2dBody.SetLinearVelocity(vel);
 				this.velocity.x(vel.x);
 				this.velocity.y(vel.y);

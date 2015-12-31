@@ -24,6 +24,48 @@ function ControlPanel(mainScene)
     });
   };
 
+  this.setAbilities = function(controlMetadata)
+  {
+    this.abilityButtons = {};
+
+    var buttonSet = {};
+    buttonSet.backgroundButton = this.button1;
+    buttonSet.cdButton = this.button1cd;
+    this.abilityButtons[controlMetadata[0].name] = buttonSet;
+
+    buttonSet = {};
+    buttonSet.backgroundButton = this.button2;
+    buttonSet.cdButton = this.button2cd;
+    this.abilityButtons[controlMetadata[1].name] = buttonSet;
+  };
+
+  // I want to see what kind of perf impact this has, so starting pretty choppy
+  this.triggerCooldown = function(cooldownInfo)
+  {
+    if(cooldownInfo.cooldown)
+    {
+      var buttonSet = this.abilityButtons[cooldownInfo.name];
+      var cooldown = cooldownInfo.cooldown;
+      var interval = Math.floor(cooldown / 10);
+      var counter = 1;
+
+      buttonSet.cdButton.applyStyle({"height": 0 + "%"});
+      var intervalId = setInterval(function()
+      {
+        if(counter === 9)
+        {
+          buttonSet.cdButton.applyStyle({"height": "90%"});
+          clearInterval(intervalId);
+        }
+        else
+        {
+          var hardToUnderstandResult = Math.floor(((10 * counter++)) * 0.9);
+          buttonSet.cdButton.applyStyle({"height": hardToUnderstandResult + "%"});
+        }
+      }, interval); // update cd info every 5x / second
+    }
+  };
+
   self.scene = new IgeScene2d()
     .id("uiScene")
     .layer(2)
@@ -49,7 +91,7 @@ function ControlPanel(mainScene)
   ige.ui.style(".healthBar", {
     "width": "100%",
     "height": "45%",
-    "backgroundColor": "green",
+    "backgroundColor": "#4AA02C",
     "top": "0%",
     "left": "0%"
   });
@@ -59,23 +101,57 @@ function ControlPanel(mainScene)
     "height": "45%",
     "borderColor": "black",
     "boderWidth": 3,
-    "backgroundColor": "blue",
+    "backgroundColor": "#1569C7",
     "top": "55%%",
     "left": "0%"
   });
 
-  ige.ui.style(".button", {
-    "width": "15%",
+  ige.ui.style(".button1", {
+    "width": "7%",
     "height": "90%",
-    "borderColor": "black",
-    "borderWidth": 3,
-    "backgroundColor": "brown",
+    //"borderColor": "black",
+    //"borderWidth": 3,
+    "backgroundColor": "#837E7C",
+    "right": "8%",
+    "top": "5%"
+  });
+
+  ige.ui.style(".button2", {
+    "width": "7%",
+    "height": "90%",
+    //"borderColor": "black",
+    //"borderWidth": 3,
+    "backgroundColor": "#837E7C",
     "right": "0%",
     "top": "5%"
   });
 
-  ige.ui.style(".button:hover", {
-    "backgroundColor": "red"
+  ige.ui.style(".button1cd", {
+    "width": "7%",
+    "height": "90%",
+    //"borderColor": "black",
+    //"borderWidth": 3,
+    "backgroundColor": "#CD7F32",
+    "right": "8%",
+    "top": "5%"
+  });
+
+  ige.ui.style(".button2cd", {
+    "width": "7%",
+    "height": "90%",
+    //"borderColor": "black",
+    //"borderWidth": 3,
+    "backgroundColor": "#CD7F32",
+    "right": "0%",
+    "top": "5%"
+  });
+
+  ige.ui.style(".button1cd:hover", {
+    "backgroundColor": "#D4A017"
+  });
+
+  ige.ui.style(".button2cd:hover", {
+    "backgroundColor": "#D4A017"
   });
 
   var controlPanel = new IgeUiElement()
@@ -101,9 +177,24 @@ function ControlPanel(mainScene)
     .allowFocus(false)
     .mount(statusBars);
 
-  self.button = new IgeUiElement()
-    .id("button")
-    .styleClass("button")
+  self.button1cd = new IgeUiElement()
+    .id("button1cd")
+    .styleClass("button1cd")
+    .mount(controlPanel);
+
+  self.button1 = new IgeUiElement()
+    .id("button1")
+    .styleClass("button1")
+    .mount(controlPanel);
+
+  self.button2cd = new IgeUiElement()
+      .id("button2cd")
+      .styleClass("button2cd")
+      .mount(controlPanel);
+
+  self.button2 = new IgeUiElement()
+    .id("button2")
+    .styleClass("button2")
     .mount(controlPanel);
 
   return this;

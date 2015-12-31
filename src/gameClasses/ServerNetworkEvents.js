@@ -69,7 +69,9 @@ var controlUpdate = new ServerNetworkMessage("controlUpdate", function(data, cli
 		// we don't want to clog up behaviour loops with an event that should be
 		// relatively rare, so handle the event directly here async to ticks
 		controls = ige.server.players[clientId].playerControl.toggleClickControls.controls;
-		controls[data.control].ability.use(data.data);
+		var ability = controls[data.control].ability;
+		var cooldown = ability.use(data.data);
+		ige.network.send("cooldown", { name: ability.name, cooldown: cooldown });
 	}
 	else if(data.type === "Click")
 	{
@@ -86,10 +88,23 @@ var requestMap = new ServerNetworkMessage("requestMap", function(data, clientId,
 });
 ServerNetworkEvents.incoming.push(requestMap);
 
+
+// ======================================================================
+// ======================================================================
+// for some reason this net io module expects all events the client will
+// ever receive to have a server side mirror. We must create them, but
+// they will just live in this zombie section where stupid features live.
+// ======================================================================
 var activate = new ServerNetworkMessage("activate", function(response){
 	//console.log('This is a bunch of bullshit, client will never send this!!!');
 });
 ServerNetworkEvents.incoming.push(activate);
+var activate = new ServerNetworkMessage("cooldown", function(response){
+	//console.log('This is a bunch of bullshit, client will never send this!!!');
+});
+ServerNetworkEvents.incoming.push(activate);
+// ======================================================================
+// ======================================================================
 
 if (typeof(module) !== "undefined" && typeof(module.exports) !== "undefined")
 {
