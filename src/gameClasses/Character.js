@@ -29,7 +29,7 @@ function Character()
 			this.width(32);
 			this._speed = 0.18;
 
-			this.addComponent(AbilityComponent);
+			this.addComponent(AbilityComponent, streamCreateData);
 
 			this.box2dBody(this._physicsSettings);
 			this.addComponent(IgeVelocityComponent);

@@ -36,7 +36,8 @@ ServerNetworkEvents.incoming.push(playerDisconnect);
 
 var playerEntity = new ServerNetworkMessage("playerEntity", function(data, clientId){
 	if (!ige.server.players[clientId]) {
-		ige.server.players[clientId] = new Character(clientId);
+		data.clientId = clientId;
+		ige.server.players[clientId] = new Character(data);
 		var controlMetadata = ige.server.players[clientId].abilitySet.getControlMetadata();
 		ige.server.players[clientId].addComponent(PlayerComponent, controlMetadata);
 

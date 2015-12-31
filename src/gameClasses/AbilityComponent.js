@@ -134,6 +134,97 @@ function getControlMetadata(abilitySet)
   return ret;
 }
 
+function Daggers(entity)
+{
+  var daggers = new ProjectileAbility("daggers", entity, 2000, "power", 10);
+  daggers.projectileInfo = {
+    category: "large", speed: 0.5, height: 32, width: 32,
+    damage: 23, lifeSpan: 900, cellRow: 13, cellCol: 4
+  };
+  return daggers;
+}
+
+function Heal(entity)
+{
+  // heal 30% of missing health
+  var heal = new Ability("heal", entity, 2000, "power", 20);
+  // because this ability is linked to a toggleclickcontrol
+  // we will receive a point with it where they clicked
+  heal.onUse = function()
+  {
+    var status = entity.status;
+    status.health(status.health() + 0.30 * (100 - status.health()));
+  };
+  return heal;
+}
+
+function Dash(entity)
+{
+  // TODO there is something wrong with this!!! it sometimes won't dash
+  var dash = new Ability("dash", entity, 3500, "power", 15);
+  dash.controlType = "ToggleClickControl";
+  dash.onUse = function(point)
+  {
+    // TODO: this seems pretty common, refactor in some way
+    var entityPosition = entity.worldPosition();
+    var direction = Math2d.subtract(point, entityPosition);
+    var norm = Math2d.normalize(direction);
+    var velocity = Math2d.scale(norm, 20);
+
+    entity.status._movementEnabled = false;
+    entity.status._dashing = true;
+    entity._box2dBody.SetLinearVelocity(velocity);
+    setTimeout(function()
+    {
+      entity.status._movementEnabled = true;
+      entity.status._dashing = false;
+      entity._box2dBody.SetLinearVelocity(new Vector2d(0,0));
+    }, 300);
+  };
+  return dash;
+}
+
+function Rocks(entity)
+{
+  var auto = new ProjectileAbility("rocks", entity, 1000, "power", 1.5);
+  auto.controlType = "ToggleClickControl";
+  auto.projectileInfo = {
+    category: "small", speed: 0.7, height: 10, width: 10,
+    damage: 6, lifeSpan: 500, cellRow: 6, cellCol: 4
+  };
+  // costs nothing, lets make it explicit and efficient
+  // auto.useCost = function(){ return true; };
+  return auto;
+}
+
+function Spikes(entity)
+{
+  var auto = new Ability("spikes", entity, 1500, "power", 15);
+  //auto.useCost = function(){ return true; };
+  var pos = { x: entity.translate().x(), y: entity.translate().y };
+  auto.attackField = new DamageField({
+    parentId: entity.id(),
+    activeSpan: 300,
+    damage: 20,
+    position: { x: pos.x, y: pos.y }
+  });
+  entity.followingChildren.push(auto.attackField);
+  var self = auto;
+  auto.onUse = function(point)
+  {
+    self.attackField.activate();
+  };
+  return auto;
+}
+
+var optionMapping = {
+  "daggers": Daggers,
+  "spikes": Spikes,
+  "heal": Heal,
+  "rocks": Rocks,
+  "dash": Dash
+};
+
 // AbilityComponent is server side only because we don't want every
 // player to be able to see every other player's abilities or ability
 // metadata. Instead we just send it on character init to only that player
@@ -147,14 +238,34 @@ function AbilityComponent()
 
     this._entity = entity;
     this._options = options;
+    console.log(options.ability3);
 
-    // players have a fixed number of abilities
+    if(!(options.ability1 && optionMapping.hasOwnProperty(options.ability1)))
+    {
+      options.ability1 = "rocks";
+    }
+    if(!(options.ability2 && optionMapping.hasOwnProperty(options.ability2)))
+    {
+      options.ability2 = "daggers";
+    }
+    if(!(options.ability3 && optionMapping.hasOwnProperty(options.ability3)))
+    {
+      options.ability3 = "dash";
+    }
+
     this.abilities = [];
-    this.abilities[0] = new ProjectileAbility("daggers", entity, 2000, "power", 10);
-    this.abilities[0].projectileInfo = {
-      category: "large", speed: 0.5, height: 32, width: 32,
-      damage: 23, lifeSpan: 900, cellRow: 13, cellCol: 4
-    };
+
+    this.autoAttack = new optionMapping[options.ability1](entity);
+    this.abilities[0] = new optionMapping[options.ability2](entity);
+    this.abilities[1] = new optionMapping[options.ability3](entity);
+
+    // // players have a fixed number of abilities
+    // this.abilities = [];
+    // this.abilities[0] = new ProjectileAbility("daggers", entity, 2000, "power", 10);
+    // this.abilities[0].projectileInfo = {
+    //   category: "large", speed: 0.5, height: 32, width: 32,
+    //   damage: 23, lifeSpan: 900, cellRow: 13, cellCol: 4
+    // };
 
     // // heal 30% of missing health
     // this.abilities[1] = new Ability(entity, 2000, "power", 20);
@@ -166,27 +277,27 @@ function AbilityComponent()
     //   status.health(status.health() + 0.30 * (100 - status.health()));
     // };
 
-    // TODO there is something wrong with this!!! it sometimes won't dash
-    this.abilities[1] = new Ability("dash", entity, 3500, "power", 15);
-    this.abilities[1].controlType = "ToggleClickControl";
-    this.abilities[1].onUse = function(point)
-    {
-      // TODO: this seems pretty common, refactor in some way
-      var entityPosition = self._entity.worldPosition();
-      var direction = Math2d.subtract(point, entityPosition);
-      var norm = Math2d.normalize(direction);
-      var velocity = Math2d.scale(norm, 20);
-
-      self._entity.status._movementEnabled = false;
-      self._entity.status._dashing = true;
-      self._entity._box2dBody.SetLinearVelocity(velocity);
-      setTimeout(function()
-      {
-  			self._entity.status._movementEnabled = true;
-        self._entity.status._dashing = false;
-        self._entity._box2dBody.SetLinearVelocity(new Vector2d(0,0));
-      }, 300);
-    };
+    // // TODO there is something wrong with this!!! it sometimes won't dash
+    // this.abilities[1] = new Ability("dash", entity, 3500, "power", 15);
+    // this.abilities[1].controlType = "ToggleClickControl";
+    // this.abilities[1].onUse = function(point)
+    // {
+    //   // TODO: this seems pretty common, refactor in some way
+    //   var entityPosition = self._entity.worldPosition();
+    //   var direction = Math2d.subtract(point, entityPosition);
+    //   var norm = Math2d.normalize(direction);
+    //   var velocity = Math2d.scale(norm, 20);
+    //
+    //   self._entity.status._movementEnabled = false;
+    //   self._entity.status._dashing = true;
+    //   self._entity._box2dBody.SetLinearVelocity(velocity);
+    //   setTimeout(function()
+    //   {
+  	// 		self._entity.status._movementEnabled = true;
+    //     self._entity.status._dashing = false;
+    //     self._entity._box2dBody.SetLinearVelocity(new Vector2d(0,0));
+    //   }, 300);
+    // };
 
     // this.autoAttack = new ProjectileAbility("ranged-auto", entity, 1000);
     // this.autoAttack.projectileInfo = {
@@ -196,22 +307,22 @@ function AbilityComponent()
     // // costs nothing, lets make it explicit and efficient
     // this.autoAttack.useCost = function(){ return true; };
 
-    this.autoAttack = new Ability("melee-auto", entity, 1500);
-    this.autoAttack.useCost = function(){ return true; };
-    // this._attacking = false;
-    // this._charactersInAttackRange = {};
-    var pos = { x: entity.translate().x(), y: entity.translate().y };
-    this.attackField = new DamageField({
-      parentId: entity.id(),
-      activeSpan: 300,
-      damage: 10,
-      position: { x: pos.x, y: pos.y }
-    });
-    entity.followingChildren.push(this.attackField);
-    this.autoAttack.onUse = function(point)
-    {
-      self.attackField.activate();
-    };
+    // this.autoAttack = new Ability("melee-auto", entity, 1500);
+    // this.autoAttack.useCost = function(){ return true; };
+    // // this._attacking = false;
+    // // this._charactersInAttackRange = {};
+    // var pos = { x: entity.translate().x(), y: entity.translate().y };
+    // this.attackField = new DamageField({
+    //   parentId: entity.id(),
+    //   activeSpan: 300,
+    //   damage: 10,
+    //   position: { x: pos.x, y: pos.y }
+    // });
+    // entity.followingChildren.push(this.attackField);
+    // this.autoAttack.onUse = function(point)
+    // {
+    //   self.attackField.activate();
+    // };
   };
 
   this.getControlMetadata = function()

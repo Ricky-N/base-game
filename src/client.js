@@ -58,8 +58,23 @@ function Client()
 						.drawBounds(false)
 						.mount(ige);
 
+					// TODO: replace this hack with real ui for picking!
+					function getParameterByName(name) {
+				    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+				    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+				        results = regex.exec(location.search);
+				    return results === null ? "" :
+							decodeURIComponent(results[1].replace(/\+/g, " "));
+					}
+
+					opts = {
+						ability1: getParameterByName("ability1"),
+						ability2: getParameterByName("ability2"),
+						ability3: getParameterByName("ability3")
+					};
+
 					// Ask the server to create an entity for us
-					ige.network.send("playerEntity");
+					ige.network.send("playerEntity", opts);
 				});
 			}
 		});
