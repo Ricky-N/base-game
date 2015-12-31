@@ -5,7 +5,7 @@ function Client()
 	this.init = function() {
 		var self = this;
 
-		ige.showStats(1);
+		//ige.addComponent(IgeEditorComponent);
 		ige.globalSmoothing(true);
 
 		ige.addComponent(IgeNetIoComponent);
@@ -67,11 +67,7 @@ function Client()
 							decodeURIComponent(results[1].replace(/\+/g, " "));
 					}
 
-					opts = {
-						ability1: getParameterByName("ability1"),
-						ability2: getParameterByName("ability2"),
-						ability3: getParameterByName("ability3")
-					};
+					opts = { abilities: getParameterByName("abilities").split(',') };
 
 					// Ask the server to create an entity for us
 					ige.network.send("playerEntity", opts);

@@ -87,130 +87,130 @@ function PressControl()
 	};
 }
 var PressControl = Control.extend(new PressControl());
-
-/**
- * A ToggleControl is turned on first button activation, and off on the second
- */
-function ToggleControl()
-{
-	this.classId = "ToggleControl";
-
-	this.init = function()
-	{
-		var self = this;
-		this._active = false;
-
-		this._control = new Control();
-		this._control.onActivation = function()
-		{
-			self._active = !self._active;
-			if(self._active)
-			{
-				self.onActivation();
-			}
-			else
-			{
-				self.onDeactivation();
-			}
-		};
-		this._control.onDeactivation = function(){};
-	};
-
-	// used to force reset of all state back to off while calling properly
-	this.clear = function()
-	{
-		// this will call ondeactivate for sure and onactivate if it was
-		// already in a low state.
-		this._control.activate();
-		this._control.deactivate();
-	};
-
-	this.activate = function()
-	{
-		this._control.activate();
-	};
-
-	this.deactivate = function()
-	{
-		this._control.deactivate();
-	};
-
-	this.onActivation = function()
-	{
-		throw "Must be overridden by child classes";
-	};
-
-	this.onDeactivation = function()
-	{
-		throw "Must be overridden by child classes";
-	};
-}
-var ToggleControl = IgeClass.extend(new ToggleControl());
-
-/**
- * A ToggleClickControl is one that is activated by a button press. Once the
- * button is pressed, the next click on screen will tell the server the desired
- * action. If the button is pressed again, it will stop listening. Because
- * different ToggleClickControls override each other, all of them must belong
- * to a single ToggleClickControlSet.
- */
-function ToggleClickControl()
-{
-	this.classId = "ToggleClickControl";
-
-	this.init = function(set, action, igeKey, ability)
-	{
-		var self = this;
-		this._set = set;
-		this.action = action;
-		this.ability = ability;
-
-		this._control = new ToggleControl();
-		this._control.onActivation = function()
-		{
-			if(self._set.clickListener)
-			{
-				self._set.controls[self._set.clickListener].clear();
-			}
-			self._set.clickListener = self.action;
-		};
-		this._control.onDeactivation = function()
-		{
-			if(self._set.clickListener === self.action)
-			{
-				self._set.clickListener = null;
-			}
-		};
-		ige.input.mapAction(action, igeKey);
-	};
-
-	this.onToggleClick = function(event)
-	{
-		var data = {
-			"type": "ToggleClick",
-			"control": this.action,
-			"data": { x: event.x, y: event.y }
-		};
-		ige.network.send("controlUpdate", data);
-		this.clear();
-	};
-
-	this.clear = function()
-	{
-		this._control.clear();
-	};
-
-	this.activate = function()
-	{
-		this._control.activate();
-	};
-
-	this.deactivate = function()
-	{
-		this._control.deactivate();
-	};
-}
-var ToggleClickControl = IgeClass.extend(new ToggleClickControl());
+//
+// /**
+//  * A ToggleControl is turned on first button activation, and off on the second
+//  */
+// function ToggleControl()
+// {
+// 	this.classId = "ToggleControl";
+//
+// 	this.init = function()
+// 	{
+// 		var self = this;
+// 		this._active = false;
+//
+// 		this._control = new Control();
+// 		this._control.onActivation = function()
+// 		{
+// 			self._active = !self._active;
+// 			if(self._active)
+// 			{
+// 				self.onActivation();
+// 			}
+// 			else
+// 			{
+// 				self.onDeactivation();
+// 			}
+// 		};
+// 		this._control.onDeactivation = function(){};
+// 	};
+//
+// 	// used to force reset of all state back to off while calling properly
+// 	this.clear = function()
+// 	{
+// 		// this will call ondeactivate for sure and onactivate if it was
+// 		// already in a low state.
+// 		this._control.activate();
+// 		this._control.deactivate();
+// 	};
+//
+// 	this.activate = function()
+// 	{
+// 		this._control.activate();
+// 	};
+//
+// 	this.deactivate = function()
+// 	{
+// 		this._control.deactivate();
+// 	};
+//
+// 	this.onActivation = function()
+// 	{
+// 		throw "Must be overridden by child classes";
+// 	};
+//
+// 	this.onDeactivation = function()
+// 	{
+// 		throw "Must be overridden by child classes";
+// 	};
+// }
+// var ToggleControl = IgeClass.extend(new ToggleControl());
+//
+// /**
+//  * A ToggleClickControl is one that is activated by a button press. Once the
+//  * button is pressed, the next click on screen will tell the server the desired
+//  * action. If the button is pressed again, it will stop listening. Because
+//  * different ToggleClickControls override each other, all of them must belong
+//  * to a single ToggleClickControlSet.
+//  */
+// function ToggleClickControl()
+// {
+// 	this.classId = "ToggleClickControl";
+//
+// 	this.init = function(set, action, igeKey, ability)
+// 	{
+// 		var self = this;
+// 		this._set = set;
+// 		this.action = action;
+// 		this.ability = ability;
+//
+// 		this._control = new ToggleControl();
+// 		this._control.onActivation = function()
+// 		{
+// 			if(self._set.clickListener)
+// 			{
+// 				self._set.controls[self._set.clickListener].clear();
+// 			}
+// 			self._set.clickListener = self.action;
+// 		};
+// 		this._control.onDeactivation = function()
+// 		{
+// 			if(self._set.clickListener === self.action)
+// 			{
+// 				self._set.clickListener = null;
+// 			}
+// 		};
+// 		ige.input.mapAction(action, igeKey);
+// 	};
+//
+// 	this.onToggleClick = function(event)
+// 	{
+// 		var data = {
+// 			"type": "ToggleClick",
+// 			"control": this.action,
+// 			"data": { x: event.x, y: event.y }
+// 		};
+// 		ige.network.send("controlUpdate", data);
+// 		this.clear();
+// 	};
+//
+// 	this.clear = function()
+// 	{
+// 		this._control.clear();
+// 	};
+//
+// 	this.activate = function()
+// 	{
+// 		this._control.activate();
+// 	};
+//
+// 	this.deactivate = function()
+// 	{
+// 		this._control.deactivate();
+// 	};
+// }
+// var ToggleClickControl = IgeClass.extend(new ToggleClickControl());
 
 // common helper method to activate control if pressed
 function checkControls(controls)
@@ -230,43 +230,43 @@ function checkControls(controls)
 	}
 }
 
-function ToggleClickControlSet()
-{
-	this.classId = "ToggleClickControlSet";
-
-	this.init = function(entity, options)
-	{
-		var self = this;
-		this.controls = {};
-		this.clickListener = null;
-	};
-
-	this.addControl = function(name, key, ability)
-	{
-		this.controls[name] = new ToggleClickControl(
-			this, name, key, ability
-		);
-	};
-
-	this.triggerClick = function(event)
-	{
-		if(this.clickListener)
-		{
-			this.controls[this.clickListener].onToggleClick(event);
-		}
-	};
-
-	this.hasActiveControl = function()
-	{
-		return this.clickListener !== null;
-	};
-
-	this.checkControls = function()
-	{
-		checkControls(this.controls);
-	};
-}
-var ToggleClickControlSet = IgeClass.extend(new ToggleClickControlSet());
+// function ToggleClickControlSet()
+// {
+// 	this.classId = "ToggleClickControlSet";
+//
+// 	this.init = function(entity, options)
+// 	{
+// 		var self = this;
+// 		this.controls = {};
+// 		this.clickListener = null;
+// 	};
+//
+// 	this.addControl = function(name, key, ability)
+// 	{
+// 		this.controls[name] = new ToggleClickControl(
+// 			this, name, key, ability
+// 		);
+// 	};
+//
+// 	this.triggerClick = function(event)
+// 	{
+// 		if(this.clickListener)
+// 		{
+// 			this.controls[this.clickListener].onToggleClick(event);
+// 		}
+// 	};
+//
+// 	this.hasActiveControl = function()
+// 	{
+// 		return this.clickListener !== null;
+// 	};
+//
+// 	this.checkControls = function()
+// 	{
+// 		checkControls(this.controls);
+// 	};
+// }
+// var ToggleClickControlSet = IgeClass.extend(new ToggleClickControlSet());
 
 function Controls()
 {
@@ -281,10 +281,10 @@ function Controls()
 		// each player has a fixed number of abilities, this will map from
 		// ability index in their abilitySet abilities to key that controls it
 		// TODO: variable player config, not static mapping
-		this.abilityIndexToControl = [
-			{ name: "action1", key: ige.input.key.q },
-			{ name: "action2", key: ige.input.key.e }
-		];
+		// this.abilityIndexToControl = [
+		// 	{ name: "action1", key: ige.input.key.q },
+		// 	{ name: "action2", key: ige.input.key.e }
+		// ];
 
 		this.directionControls = {
 			left: new PressControl("left", ige.input.key.a, {}, "Direction"),
@@ -293,28 +293,34 @@ function Controls()
 			down: new PressControl("down", ige.input.key.s, {}, "Direction")
 		};
 
-		this.pressControls = {};
-		this.toggleClickControls = new ToggleClickControlSet(entity);
-		this.addAbilityControls(controlMetadata);
+		//this.pressControls = {};
+		//this.toggleClickControls = new ToggleClickControlSet(entity);
+		//this.addAbilityControls(controlMetadata);
 
 		if(ige.isClient)
 		{
-			ige.client.mainScene.mouseDown(function()
+			ige.client.mainScene.mouseDown(function(e, control)
 			{
-				var event = ige._currentViewport.mousePos();
-				if(self.toggleClickControls.hasActiveControl())
-				{
-					self.toggleClickControls.triggerClick(event);
-				}
-				else
-				{
+				var mousePos = ige._currentViewport.mousePos();
+
+				// trying new control set with only shift mouse buttons!
+				// if(self.toggleClickControls.hasActiveControl())
+				// {
+				// 	self.toggleClickControls.triggerClick(event);
+				// }
+				var button = e.which
+				// mouse buttons are left: 1, middle: 2, right: 3, lets add shifts
+				// so we get left: 0, shift-left: 1, middle: 2, shift-middle: 3, ..
+				var shiftButton = (button - 1) * 2 + (e.shiftKey ? 1 : 0);
+				// else
+				// {
 					// if none of the toggleClickControls are active, we can use this click event
 					var data = {
 						"type": "Click",
-						"data": { x: event.x, y: event.y }
+						"data": { x: mousePos.x, y: mousePos.y, button: shiftButton }
 					};
 					ige.network.send("controlUpdate", data);
-				}
+				// }
 			});
 		}
 
@@ -322,30 +328,30 @@ function Controls()
 		this._entity.addBehaviour("playerComponent_behaviour", this._behaviour);
 	};
 
-	this.addAbilityControls = function(abilityControls)
-	{
-		for(var i = 0; i < abilityControls.length; i++)
-		{
-			// TODO: do we need a switch?
-			if(abilityControls[i].controlType === "ToggleClickControl")
-			{
-				this.toggleClickControls.addControl(
-					this.abilityIndexToControl[i].name,
-					this.abilityIndexToControl[i].key,
-					ige.isServer ? this._entity.abilitySet.abilities[i] : {}
-				);
-			}
-			else if(abilityControls[i].controlType === "PressControl")
-			{
-				this.pressControls[this.abilityIndexToControl[i].name] =
-					new PressControl(
-						this.abilityIndexToControl[i].name,
-						this.abilityIndexToControl[i].key,
-						ige.isServer ? this._entity.abilitySet.abilities[i] : {}
-					);
-			}
-		}
-	};
+	// this.addAbilityControls = function(abilityControls)
+	// {
+	// 	for(var i = 0; i < abilityControls.length; i++)
+	// 	{
+	// 		// TODO: do we need a switch?
+	// 		if(abilityControls[i].controlType === "ToggleClickControl")
+	// 		{
+	// 			this.toggleClickControls.addControl(
+	// 				this.abilityIndexToControl[i].name,
+	// 				this.abilityIndexToControl[i].key,
+	// 				ige.isServer ? this._entity.abilitySet.abilities[i] : {}
+	// 			);
+	// 		}
+	// 		else if(abilityControls[i].controlType === "PressControl")
+	// 		{
+	// 			this.pressControls[this.abilityIndexToControl[i].name] =
+	// 				new PressControl(
+	// 					this.abilityIndexToControl[i].name,
+	// 					this.abilityIndexToControl[i].key,
+	// 					ige.isServer ? this._entity.abilitySet.abilities[i] : {}
+	// 				);
+	// 		}
+	// 	}
+	// };
 
 	/**
 	 * Called every frame by the engine when this entity is mounted to the
@@ -356,14 +362,14 @@ function Controls()
 	{
 		if (ige.isServer)
 		{
-			var controls = this.playerControl.pressControls;
-			for(var key in controls)
-			{
-				if(controls.hasOwnProperty(key) && controls[key]._active)
-				{
-					controls[key].ability.use();
-				}
-			}
+			// var controls = this.playerControl.pressControls;
+			// for(var key in controls)
+			// {
+			// 	if(controls.hasOwnProperty(key) && controls[key]._active)
+			// 	{
+			// 		controls[key].ability.use();
+			// 	}
+			// }
 
 			if(this.status._movementEnabled)
 			{
@@ -394,9 +400,9 @@ function Controls()
 		}
 		else // => ige.isClient
 		{
-			this.playerControl.toggleClickControls.checkControls();
+			// this.playerControl.toggleClickControls.checkControls();
 			checkControls(this.playerControl.directionControls);
-			checkControls(this.playerControl.pressControls);
+			// checkControls(this.playerControl.pressControls);
 		}
 	};
 

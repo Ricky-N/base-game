@@ -52,31 +52,47 @@ var playerEntity = new ServerNetworkMessage("playerEntity", function(data, clien
 });
 ServerNetworkEvents.incoming.push(playerEntity);
 
+var buttonToAbility =
+{
+	0: 0,
+	1: 1,
+	4: 2,
+	5: 3
+};
+
 var controlUpdate = new ServerNetworkMessage("controlUpdate", function(data, clientId){
 	// TODO: switch
 	var controls;
-	if(data.type === "Press")
-	{
-		controls = ige.server.players[clientId].playerControl.pressControls;
-		controls[data.control]._active = data.data;
-	}
-	else if(data.type === "Direction")
+	// if(data.type === "Press")
+	// {
+	// 	controls = ige.server.players[clientId].playerControl.pressControls;
+	// 	controls[data.control]._active = data.data;
+	// }
+	/*else*/ if(data.type === "Direction")
 	{
 		controls = ige.server.players[clientId].playerControl.directionControls;
 		controls[data.control]._active = data.data;
 	}
-	else if(data.type === "ToggleClick")
-	{
-		// we don't want to clog up behaviour loops with an event that should be
-		// relatively rare, so handle the event directly here async to ticks
-		controls = ige.server.players[clientId].playerControl.toggleClickControls.controls;
-		var ability = controls[data.control].ability;
-		var cooldown = ability.use(data.data);
-		ige.network.send("cooldown", { name: ability.name, cooldown: cooldown });
-	}
+	// else if(data.type === "ToggleClick")
+	// {
+	// 	// we don't want to clog up behaviour loops with an event that should be
+	// 	// relatively rare, so handle the event directly here async to ticks
+	// 	controls = ige.server.players[clientId].playerControl.toggleClickControls.controls;
+	// 	var ability = controls[data.control].ability;
+	// 	var cooldown = ability.use(data.data);
+	// 	ige.network.send("cooldown", { name: ability.name, cooldown: cooldown });
+	// }
 	else if(data.type === "Click")
 	{
-		ige.server.players[clientId].abilitySet.autoAttack.use(data.data);
+		if(buttonToAbility.hasOwnProperty(data.data.button))
+		{
+			var abilityIndex = buttonToAbility[data.data.button];
+			ability = ige.server.players[clientId].abilitySet.abilities[abilityIndex];
+			if(ability)
+			{
+				ability.use(data.data);
+			}
+		}
 	}
 });
 ServerNetworkEvents.incoming.push(controlUpdate);
