@@ -205,7 +205,7 @@ function Spikes(entity)
   auto.attackField = new DamageField({
     parentId: entity.id(),
     activeSpan: 300,
-    damage: 20,
+    damage: 30,
     position: { x: pos.x, y: pos.y }
   });
   entity.followingChildren.push(auto.attackField);
