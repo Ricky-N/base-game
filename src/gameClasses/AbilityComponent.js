@@ -161,7 +161,7 @@ function Heal(entity)
 function Dash(entity)
 {
   // TODO there is something wrong with this!!! it sometimes won't dash
-  var dash = new Ability("dash", entity, 3500, "power", 15);
+  var dash = new Ability("dash", entity, 3500, "power", 9);
   dash.controlType = "ToggleClickControl";
   dash.onUse = function(point)
   {
