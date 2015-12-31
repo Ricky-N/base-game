@@ -113,7 +113,7 @@ function Server()
 					// begin listening to incoming network events
 					ServerNetworkEvents.listen();
 					ige.network.addComponent(IgeStreamComponent)
-						 .stream.sendInterval(30)
+						 .stream.sendInterval(50)
 						 .stream.start();
 					ige.network.acceptConnections(true);
 

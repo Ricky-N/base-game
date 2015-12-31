@@ -72,6 +72,8 @@ function ControlPanel(mainScene)
     .ignoreCamera(true)
     .mount(mainScene);
 
+  new IgeUiTimeStream().mount(self.scene);
+
   ige.ui.style(".controlPanel", {
     "width": "80%",
     "height": "7%",

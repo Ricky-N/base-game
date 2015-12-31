@@ -34,7 +34,7 @@ function Client()
 
 					// Setup the network stream handler, log when we get new things
 					ige.network.addComponent(IgeStreamComponent)
-						.stream.renderLatency(80)
+						.stream.renderLatency(100)
 						.stream.on("entityCreated", function (entity) {
 							self.players.push(entity);
 							self.log("Stream entity created with ID: " + entity.id());
@@ -67,7 +67,7 @@ function Client()
 							decodeURIComponent(results[1].replace(/\+/g, " "));
 					}
 
-					opts = { abilities: getParameterByName("abilities").split(',') };
+					opts = { abilities: getParameterByName("abilities").split(",") };
 
 					// Ask the server to create an entity for us
 					ige.network.send("playerEntity", opts);

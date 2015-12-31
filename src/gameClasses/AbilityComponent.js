@@ -264,7 +264,7 @@ function AbilityComponent()
     }
 
     this.abilities = [];
-    for(i = 0; i < abilityChoices.length; i++)
+    for(var i = 0; i < abilityChoices.length; i++)
     {
       this.abilities[i] = new optionMapping[abilityChoices[i]](entity);
     }

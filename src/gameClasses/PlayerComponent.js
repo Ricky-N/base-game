@@ -308,7 +308,7 @@ function Controls()
 				// {
 				// 	self.toggleClickControls.triggerClick(event);
 				// }
-				var button = e.which
+				var button = e.which;
 				// mouse buttons are left: 1, middle: 2, right: 3, lets add shifts
 				// so we get left: 0, shift-left: 1, middle: 2, shift-middle: 3, ..
 				var shiftButton = (button - 1) * 2 + (e.shiftKey ? 1 : 0);
