@@ -308,10 +308,12 @@ function Controls()
 				// {
 				// 	self.toggleClickControls.triggerClick(event);
 				// }
-				var button = e.which;
+
+
 				// mouse buttons are left: 1, middle: 2, right: 3, lets add shifts
-				// so we get left: 0, shift-left: 1, middle: 2, shift-middle: 3, ..
-				var shiftButton = (button - 1) * 2 + (e.shiftKey ? 1 : 0);
+				// so we get l:0, m:1, r:2, s+l:3, s+m:4, s+r:5
+				var button = e.which;
+				var shiftButton = (button - 1) + (e.shiftKey ? 3 : 0);
 				// else
 				// {
 					// if none of the toggleClickControls are active, we can use this click event

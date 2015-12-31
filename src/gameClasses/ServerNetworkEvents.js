@@ -54,10 +54,10 @@ ServerNetworkEvents.incoming.push(playerEntity);
 
 var buttonToAbility =
 {
-	0: 0,
-	1: 1,
-	4: 2,
-	5: 3
+	0: 0, // left click -> ability 1
+	2: 1, // right click -> ability 2
+	3: 2, // shift + left -> ability 3
+	5: 3	// shift + right -> ability 4
 };
 
 var controlUpdate = new ServerNetworkMessage("controlUpdate", function(data, clientId){
@@ -90,7 +90,11 @@ var controlUpdate = new ServerNetworkMessage("controlUpdate", function(data, cli
 			ability = ige.server.players[clientId].abilitySet.abilities[abilityIndex];
 			if(ability)
 			{
-				ability.use(data.data);
+				var cooldown = ability.use(data.data);
+				ige.network.send("cooldown", {
+					index: abilityIndex,
+					cooldown: cooldown
+				});
 			}
 		}
 	}
