@@ -85,14 +85,14 @@ function Background(mainScene){
 
           // Create the static objects in box2d
   				var obj = new IgeEntityBox2d()
-            //.streamMode(0) // don't stream these down, purely physics
+            .streamMode(0) // don't stream these down, purely physics
   					.translateTo(xPos, yPos, 0)
   					.width(mapObject.width)
   					.height(mapObject.height)
   					.mount(this.scene)
-  					.box2dBody(this.physicsProperties);
+  					.box2dBody(this._physicsProperties);
 
-          //obj.isStatic = true;
+          obj.isStatic = true;
           this.objects.push(obj);
         }
       }
