@@ -102,6 +102,14 @@ var controlUpdate = new ServerNetworkMessage("controlUpdate", function(data, cli
 ServerNetworkEvents.incoming.push(controlUpdate);
 
 var requestMap = new ServerNetworkMessage("requestMap", function(data, clientId, requestId){
+
+	// TODO: this should live on it's own server, almost like a CDN, but specifically
+	// to make sure we serve up static entities without fucking every other player
+	for(var i = 0; i < ige.server.background.entities.length; i++)
+	{
+		ige.server.background.entities[i].streamSync([clientId]);
+	}
+
 	// Send the Map data back
 	// TODO, have this loaded somehow other than through that js file
 	// such as persistent db document

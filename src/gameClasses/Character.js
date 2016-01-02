@@ -20,8 +20,8 @@ function Character()
 		this.followingChildren = [];
 
 		// for now lets start everyone a little into the map
-		this.translate().x(400);
-		this.translate().y(350);
+		this.translate().x(300);
+		this.translate().y(1885);
 
 		if (ige.isServer)
 		{

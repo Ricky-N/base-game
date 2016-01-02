@@ -15,7 +15,7 @@ function Client()
 		this.renderLatency = 100;
 
 		// TODO better object here!
-		this.players = [];
+		this.characters = [];
 
 		// we don't do any pre-loading of textures right now, it
 		// may be a good idea to base load some in case perf in
@@ -39,7 +39,10 @@ function Client()
 					ige.network.addComponent(IgeStreamComponent)
 						.stream.renderLatency(self.renderLatency)
 						.stream.on("entityCreated", function (entity) {
-							self.players.push(entity);
+							if(entity.classId() === "Character")
+							{
+								self.characters.push(entity);
+							}
 							self.log("Stream entity created with ID: " + entity.id());
 						});
 

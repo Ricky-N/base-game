@@ -119,13 +119,11 @@ function Server()
 
 					self.mainScene = new IgeScene2d().id("mainScene");
 
-					// TODO: extend Background for server so that we can
-					// use it for collision info with things like mountains
-					self.background = new Background(self.mainScene);
-
 					self.foregroundScene = new IgeScene2d()
 						.id("foregroundScene")
 						.mount(self.mainScene);
+
+					self.background = new Background(self.mainScene);
 
 					// Create the main viewport and set the scene
 					// it will "look" at as the new scene1 we just
