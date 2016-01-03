@@ -100,7 +100,7 @@ function Background(mainScene){
       {
         // TODO: generate this in our postprocess of the json file.
         var objectMapping = {
-          39: {
+          21: {
             "sheetData":{
               "location": "./official/tree.png",
               "columns": 2,
@@ -116,7 +116,7 @@ function Background(mainScene){
               "height": 32,
             }
           },
-          40: {
+          22: {
             "sheetData":{
               "location": "./official/tree.png",
               "columns": 2,
@@ -136,7 +136,7 @@ function Background(mainScene){
 
         // for now we assume ground is always a client texture, they need
         // to display something! but everything else is fair game to remove
-        if(Map.layers[i].name !== "Ground")
+        if(Map.layers[i].name !== "BaseLayer")
         {
           var data = Map.layers[i].data;
           for(var j = 0; j < data.length; j++)
