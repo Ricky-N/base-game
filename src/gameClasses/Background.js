@@ -66,6 +66,7 @@ function Background(mainScene){
     this.objects = [];
     this.entities = [];
     layersToRemove = [];
+    var j;
     for(var i = 0; i < Map.layers.length; i++)
     {
       // if it is an object layer it is purely something we
@@ -74,7 +75,7 @@ function Background(mainScene){
       {
         layersToRemove.push(i);
         var len = Map.layers[i].objects.length;
-        for(var j = 0; j < len; j++)
+        for(j = 0; j < len; j++)
         {
           var mapObject = Map.layers[i].objects[j];
 
@@ -139,7 +140,7 @@ function Background(mainScene){
         if(Map.layers[i].name !== "BaseLayer")
         {
           var data = Map.layers[i].data;
-          for(var j = 0; j < data.length; j++)
+          for(j = 0; j < data.length; j++)
           {
             var mapping = objectMapping[data[j]];
             if(typeof mapping !== "undefined")

@@ -43,7 +43,7 @@ function Client()
 							{
 								self.characters.push(entity);
 							}
-							self.log("Stream entity created with ID: " + entity.id());
+							//self.log("Stream entity created with ID: " + entity.id());
 						});
 
 					self.mainScene = new IgeScene2d().id("mainScene")
