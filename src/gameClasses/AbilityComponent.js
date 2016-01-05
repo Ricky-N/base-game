@@ -213,16 +213,16 @@ function Explosion(entity)
 {
   var explosion = new Ability("explosion", entity, 2000, "power", 20);
   var pos = { x: entity.translate().x(), y: entity.translate().y };
-  explosion.explosionField = new DamageField({
+  var field = new DamageField({
     activeSpan: 300,
     damage: 15,
     position: { x: 0, y: 0 } // TODO: first activation hits 0,0 for some reason
   });
   explosion.onUse = function(point)
   {
-    explosion.explosionField.translateTo(point.x, point.y, 0);
-    explosion.explosionField.activate();
+    field.activate(point);
   };
+  explosion.explosionField = field;
   return explosion;
 }
 

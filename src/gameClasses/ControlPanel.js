@@ -21,32 +21,28 @@ function ControlPanel(mainScene)
   this.trackStatus = function(player)
   {
     player.status.on("healthChange", function(newHealth) {
-      var width = Math.floor(100 * newHealth / player._maxHealth);
-      self.healthBar.applyStyle({"width": width + "%"});
+      self.healthBar.applyStyle({"width": newHealth + "%"});
     });
 
     player.status.on("powerChange", function(newPower) {
-      var width = Math.floor(100 * newPower / player._maxPower);
-      self.powerBar.applyStyle({"width": width + "%"});
+      self.powerBar.applyStyle({"width": newPower + "%"});
     });
   };
 
-  // We don't use this for now after moving controls to click,
-  // but it may come in handy later
-  // this.setAbilities = function(controlMetadata)
-  // {
-  //   this.abilityButtons = {};
-  //
-  //   var buttonSet = {};
-  //   buttonSet.backgroundButton = this.button1;
-  //   buttonSet.cdButton = this.button1cd;
-  //   this.abilityButtons[controlMetadata[0].name] = buttonSet;
-  //
-  //   buttonSet = {};
-  //   buttonSet.backgroundButton = this.button2;
-  //   buttonSet.cdButton = this.button2cd;
-  //   this.abilityButtons[controlMetadata[1].name] = buttonSet;
-  // };
+  this.setAbilities = function(controlMetadata)
+  {
+    this.abilityButtons = {};
+
+    var buttonSet = {};
+    buttonSet.backgroundButton = this.button1;
+    buttonSet.cdButton = this.button1cd;
+    this.abilityButtons[controlMetadata[0].name] = buttonSet;
+
+    buttonSet = {};
+    buttonSet.backgroundButton = this.button2;
+    buttonSet.cdButton = this.button2cd;
+    this.abilityButtons[controlMetadata[1].name] = buttonSet;
+  };
 
   this.triggerCooldown = function(cooldownInfo)
   {

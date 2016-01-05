@@ -21,12 +21,13 @@ function DamageField()
 
       this.translate().x(create.position.x);
       this.translate().y(create.position.y);
-      this.streamMode(1);
 
       this._active = false;
       this._charactersInRange = {};
       this._damage = create.damage;
       this.box2dBody(this._physicsSettings);
+
+      this.streamMode(1);
     }
     else // ige.isClient
     {
@@ -85,6 +86,8 @@ function DamageField()
     var self = this;
     if(ige.isServer)
     {
+      this.translateTo(position.x, position.y, 0);
+
       this._active = true;
       ige.network.send("activate", this.id());
 
