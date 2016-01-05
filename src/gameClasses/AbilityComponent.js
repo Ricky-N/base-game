@@ -17,7 +17,6 @@ function Ability()
 
   this.onCooldown = function()
   {
-    // TODO: is this actually more efficient?
     if(!this._onCooldown)
     {
       return false;
@@ -45,7 +44,7 @@ function Ability()
       this.onUse(arg);
       return this.cooldown;
     }
-    // TODO: we should maybe return some failure status code?
+    // TODO: some failure status reason should be returned
   };
 
   /**
@@ -101,7 +100,7 @@ function ProjectileAbility()
     // we don't want the projectile to overlap our entity, so place it starting
     // at closest distance we can, which is basically the straight line distance
     // to the entity of the corner's bounding box plus one
-    // TODO: cache this!!!!
+    // TODO: implement and cache this
     // var bounds = self._entity.bounds2d();
     // var minSafeDistance = Math2d.pythagoras(bounds) + 5;
     // //Math2d.scale(norm, minSafeDistance));
@@ -140,8 +139,7 @@ function Heal(entity)
 {
   // heal 30% of missing health
   var heal = new Ability("heal", entity, 2000, "power", 20);
-  // because this ability is linked to a toggleclickcontrol
-  // we will receive a point with it where they clicked
+
   heal.onUse = function()
   {
     var status = entity.status;
@@ -152,7 +150,7 @@ function Heal(entity)
 
 function Dash(entity)
 {
-  // TODO there is something wrong with this!!! it sometimes won't dash
+  // TODO fix bug related to dash when standing still
   var dash = new Ability("dash", entity, 3500, "power", 9);
   dash.controlType = "ToggleClickControl";
   dash.onUse = function(point)
@@ -178,37 +176,37 @@ function Dash(entity)
 
 function Rocks(entity)
 {
-  var auto = new ProjectileAbility("rocks", entity, 1000, "power", 1.5);
-  auto.controlType = "ToggleClickControl";
-  auto.projectileInfo = {
+  var rocks = new ProjectileAbility("rocks", entity, 1000, "power", 1.5);
+  rocks.controlType = "ToggleClickControl";
+  rocks.projectileInfo = {
     category: "small", speed: 0.7, height: 10, width: 10,
     damage: 6, lifeSpan: 500, cellRow: 6, cellCol: 4
   };
-  auto.cellSheetInfo = {
+  rocks.cellSheetInfo = {
     sheet: "./textures/tiles/tilee5.png",
     columns: 16,
     rows: 16,
   };
-  return auto;
+  return rocks;
 }
 
 function Spikes(entity)
 {
-  var auto = new Ability("spikes", entity, 1500, "power", 15);
-  //auto.useCost = function(){ return true; };
+  var spikes = new Ability("spikes", entity, 1500, "power", 15);
+
   var pos = { x: entity.translate().x(), y: entity.translate().y };
-  auto.attackField = new DamageField({
+  spikes.attackField = new DamageField({
     parentId: entity.id(),
     activeSpan: 300,
     damage: 30,
     position: { x: pos.x, y: pos.y }
   });
-  entity.followingChildren.push(auto.attackField);
+  entity.followingChildren.push(spikes.attackField);
   auto.onUse = function(point)
   {
-    auto.attackField.activate();
+    spikes.attackField.activate();
   };
-  return auto;
+  return spikes;
 }
 
 function Explosion(entity)
@@ -218,7 +216,7 @@ function Explosion(entity)
   explosion.explosionField = new DamageField({
     activeSpan: 300,
     damage: 15,
-    position: { x: 0, y: 0 } // ?? lol
+    position: { x: 0, y: 0 } // TODO: first activation hits 0,0 for some reason
   });
   explosion.onUse = function(point)
   {
@@ -282,6 +280,7 @@ function AbilityComponent()
     }
   };
 
+  // currently unused, but useful if we get off of click controls again
   this.getControlMetadata = function()
   {
     var ret = [];
@@ -297,7 +296,8 @@ function AbilityComponent()
 
   // for things like projectiles we don't want to create a new
   // cell sheet every time the projectile is created, but we also
-  // don't have a client side abilitySet to hold the reference
+  // don't have a client side abilitySet to hold the reference. We
+  // will pass back info here that the server can ship down
   this.getCellSheetInfo = function()
   {
     var cellSheetInfo = [];

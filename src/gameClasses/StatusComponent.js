@@ -3,7 +3,8 @@ function StatusComponent()
    this.classId = "StatusComponent";
    this.componentId = "status";
 
-   this.init = function (entity, options) {
+   this.init = function (entity, options)
+   {
     var self = this;
     this._entity = entity;
     this._options = options;
@@ -21,18 +22,19 @@ function StatusComponent()
     };
     this._health = 100;
     this._maxHealth = 100;
+
     this.changeListeners.powerChange = {
       "callbacks": [],
       "member": "_power"
     };
     this._power = 100;
     this._maxPower = 100;
+
     this.changeListeners.death = {
       "callbacks": [],
       "member": "_health"
     };
 
-    // Add the statusComponent behaviour to the entity
     this._entity.addBehaviour("statusComponent_behaviour", this._behaviour);
   };
 

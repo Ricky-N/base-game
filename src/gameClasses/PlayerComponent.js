@@ -87,7 +87,7 @@ function PressControl()
 	};
 }
 var PressControl = Control.extend(new PressControl());
-//
+
 // /**
 //  * A ToggleControl is turned on first button activation, and off on the second
 //  */
@@ -278,9 +278,9 @@ function Controls()
 		var self = this;
 		this._entity = entity;
 
+		// TODO: useful for things like potions maybe, keep around for now
 		// each player has a fixed number of abilities, this will map from
 		// ability index in their abilitySet abilities to key that controls it
-		// TODO: variable player config, not static mapping
 		// this.abilityIndexToControl = [
 		// 	{ name: "action1", key: ige.input.key.q },
 		// 	{ name: "action2", key: ige.input.key.e }
@@ -326,7 +326,6 @@ function Controls()
 			});
 		}
 
-		// Add the playerComponent behaviour to the entity
 		this._entity.addBehaviour("playerComponent_behaviour", this._behaviour);
 	};
 
@@ -394,6 +393,7 @@ function Controls()
 				{
 					vel = controlVec;
 				}
+				
 				// TODO: do we need velocity component when we have box2d?
 				//this._box2dBody.SetLinearVelocity(vel);
 				this.velocity.x(vel.x);

@@ -13,9 +13,9 @@ function Character()
 			console.log("Character with id " + this.id + " has died!");
 		});
 
-		// Store the existing transform methods
+		// we want to have some entities perfectly follow
+		// this one, so we have to remap the translate
 		this._translateToProtoChar = this.translateTo;
-		// Take over the transform methods
 		this.translateTo = this._translateToChar;
 		this.followingChildren = [];
 
@@ -30,10 +30,6 @@ function Character()
 			this._speed = 0.18;
 
 			this.addComponent(AbilityComponent, createData);
-			// get information destined for the client about what
-			// textures are required to display these abilities. This
-			// is required as we don't have a client side AbilityComponent
-			// so that it is almost completely shielded enemies do.
 			this.abilitySheetInfo = this.abilitySet.getCellSheetInfo();
 
 			this.box2dBody(this._physicsSettings);
@@ -66,7 +62,6 @@ function Character()
 	};
 
 	this._translateToChar = function (x, y, z) {
-		// Call the original method
 		this._translateToProtoChar(x, y, z);
 
 		// if we have any following children, move them as well
@@ -118,7 +113,6 @@ function Character()
 		}
 	};
 
-	// Prepare data fro the client to initialize
 	this.streamCreateData = function(data)
 	{
 		if(typeof data !== "undefined")
@@ -138,16 +132,6 @@ function Character()
 		}
 	};
 
-	/**
-	 * Override the default IgeEntity class streamSectionData() method
-	 * so that we can check for the custom1 section and handle how we deal
-	 * with it.
-	 * @param {String} sectionId A string identifying the section to
-	 * handle data get / set for.
-	 * @param {*=} data If present, this is the data that has been sent
-	 * from the server to the client for this entity.
-	 * @return {*}
-	 */
 	this.streamSectionData = function(sectionId, data)
 	{
 		if(sectionId === "status")
@@ -169,13 +153,8 @@ function Character()
     }
 	};
 
-	/**
-	 * Sets the type of character which determines the character"s
-	 * animation sequences and appearance.
-	 * @param {Number} type From 0 to 7, determines the character"s
-	 * appearance.
-	 * @return {*}
-	 */
+	// Sets the type of character which determines the character's
+ 	// animation sequences and appearance.
 	this.skin = function (skin)
 	{
 		if(typeof skin === "undefined")
@@ -188,7 +167,7 @@ function Character()
 
 			if(ige.isClient)
 			{
-				// TODO: move this somewhere along with the assets
+				// TODO: move this into metadata along with the assets
 				switch (skin) {
 					case 0:
 						this.animation.define("walkDown", [1, 2, 3, 2], 8, -1)
@@ -278,70 +257,71 @@ function Character()
 		if (ige.isClient) {
 			// Set the current animation based on direction
 			var self = this,
-				oldX = this._lastTranslate.x,
-				oldY = this._lastTranslate.y * 2,
-				currX = this.translate().x(),
-				currY = this.translate().y() * 2,
-				distX = currX - oldX,
-				distY = currY - oldY,
-				distance = Math.distance(oldX, oldY, currX, currY),
-				speed = 0.1,
-				time = (distance / speed);
+					oldX = this._lastTranslate.x,
+					oldY = this._lastTranslate.y * 2,
+					currX = this.translate().x(),
+					currY = this.translate().y() * 2,
+					distX = currX - oldX,
+					distY = currY - oldY,
+					distance = Math.distance(oldX, oldY, currX, currY),
+					speed = 0.1,
+					time = (distance / speed);
 
 			this._lastTranslate = this._translate.clone();
 
-			if (distX === 0 && distY === 0) {
+			if (distX === 0 && distY === 0)
+			{
 				this.animation.stop();
-			} else {
+			}
+			else
+			{
 				// Set the animation based on direction
-				if (Math.abs(distX) > Math.abs(distY)) {
+				if (Math.abs(distX) > Math.abs(distY))
+				{
 					// Moving horizontal
-					if (distX < 0) {
-						// Moving left
+					if (distX < 0)
+					{
 						this.animation.select("walkLeft");
-					} else {
-						// Moving right
+					}
+					else
+					{
 						this.animation.select("walkRight");
 					}
-				} else {
+				}
+				else
+				{
 					// Moving vertical
-					if (distY < 0) {
-						if (distX < 0) {
-							// Moving up-left
+					if (distY < 0)
+					{
+						if (distX < 0)
+						{
 							this.animation.select("walkUp");
-						} else {
-							// Moving up
+						}
+						else
+						{
 							this.animation.select("walkRight");
 						}
-					} else {
-						if (distX > 0) {
-							// Moving down-right
+					}
+					else
+					{
+						if (distX > 0)
+						{
 							this.animation.select("walkDown");
-						} else {
-							// Moving down
+						}
+						else
+						{
 							this.animation.select("walkLeft");
 						}
 					}
 				}
 			}
 
-			// Set the depth to the y co-ordinate which basically
-			// makes the entity appear further in the foreground
-			// the closer they become to the bottom of the screen
+			// Set the depth to the y coordinate so that we can properly
+			// draw "closer" entities on top of the "farther" ones.
 			this.depth(this._translate.y);
 		}
 
 		IgeEntityBox2d.prototype.update.call(this, ctx, tickDelta);
-	},
-
-	this.destroy = function () {
-		// Destroy the texture object
-		if (this._characterTexture) {
-			this._characterTexture.destroy();
-		}
-
-		// Call the super class
-		IgeEntityBox2d.prototype.destroy.call(this);
 	};
 }
 

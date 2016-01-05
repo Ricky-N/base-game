@@ -4,8 +4,6 @@ function Projectile()
 {
   this.classId = "Projectile";
 
-  // on server create is passed from new Projectile(create),
-  // on client it comes from this.streamCreateData
   this.init = function(create)
   {
     var self = this;
@@ -44,29 +42,12 @@ function Projectile()
       this.cellRow = create.cellRow;
       this.cellCol = create.cellCol;
 
-      // TODO: load this with the character, also this cell sheet has white space!!
-      // for now, all projectiles live on the same cell sheet
       var managedTexture = ige.sheetManager.registerCallback(
         "./textures/tiles/tilee5.png", function(texture){
           self.texture(texture);
           self.cell(self.cellRow * 16 + self.cellCol);
         }
       );
-
-      // this._projectileTexture = managedTexture.sheet;
-      // var onLoaded = function () {
-      //   self.texture(self._projectileTexture);
-      //   self.cell(self.cellRow * 16 + self.cellCol);
-      // }
-      //
-      // if(managedTexture.loaded)
-      // {
-      //   onLoaded();
-      // }
-      // else
-      // {
-      //   this._projectileTexture.on("loaded", onLoaded, false, true);
-      // }
     }
 
     this.lifeSpan(create.lifeSpan);
@@ -91,24 +72,12 @@ function Projectile()
     gravitic: true,
     fixtures: [{
       density: 1.0, friction: 0.5, restitution: 0.0,
-      shape: {
-        type: "rectangle"
-      },
+      shape: { type: "rectangle" },
       filter: {
         categoryBits: 4,
         maskBits: 5
       }
     }]
-  };
-
-  this.destroy = function () {
-    // Destroy the texture object
-    if (this._projectileTexture) {
-      this._projectileTexture.destroy();
-    }
-
-    // Call the super class
-    IgeEntityBox2d.prototype.destroy.call(this);
   };
 }
 var Projectile = IgeEntityBox2d.extend(new Projectile());

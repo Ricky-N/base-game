@@ -1,6 +1,6 @@
 function Background(mainScene){
 
-  // TODO: Move this somewhere not here lol
+  // TODO: Move this somewhere more appropriate
   // Array Remove - By John Resig (MIT Licensed)
   Array.prototype.remove = function(from, to) {
     var rest = this.slice((to || from) + 1 || this.length);
@@ -135,7 +135,7 @@ function Background(mainScene){
           }
         };
 
-        // for now we assume ground is always a client texture, they need
+        // for now we assume baselayer is always a client texture, they need
         // to display something! but everything else is fair game to remove
         if(Map.layers[i].name !== "BaseLayer")
         {
@@ -163,10 +163,6 @@ function Background(mainScene){
               data[j] = 0;
             }
           }
-          // if the object is in our object mapping
-
-          // create a new map object entity
-          // remove from the layer
 
           // if the layer is empty after this, mark it for trimming
           var empty = true;
@@ -187,6 +183,7 @@ function Background(mainScene){
     }
 
     // peel off the layers that shouldn't be sent to client
+    // as they had contained only MapObjects
     for(i = 0; i < layersToRemove.length; i++)
     {
       Map.layers.remove(layersToRemove[i]);

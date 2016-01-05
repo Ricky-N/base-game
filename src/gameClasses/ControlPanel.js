@@ -2,6 +2,7 @@ function ControlPanel(mainScene)
 {
   var self = this;
 
+  // The ui classes seem to be pretty weak, lets override this method
   IgeUiButton.prototype.tick = function(ctx)
   {
     IgeUiElement.prototype.tick.call(this, ctx);
@@ -19,42 +20,34 @@ function ControlPanel(mainScene)
 
   this.trackStatus = function(player)
   {
-    player.status.on("healthChange", function(newHealth){
-      // for now we know that 100 is the max health :/
-      var width = newHealth;
-      if(newHealth < 0)
-      {
-        width = 0;
-      }
+    player.status.on("healthChange", function(newHealth) {
+      var width = Math.floor(100 * newHealth / player._maxHealth);
       self.healthBar.applyStyle({"width": width + "%"});
     });
 
-    player.status.on("powerChange", function(newPower){
-      var width = newPower;
-      if(newPower < 0)
-      {
-        width = 0;
-      }
+    player.status.on("powerChange", function(newPower) {
+      var width = Math.floor(100 * newPower / player._maxPower);
       self.powerBar.applyStyle({"width": width + "%"});
     });
   };
 
-  this.setAbilities = function(controlMetadata)
-  {
-    this.abilityButtons = {};
+  // We don't use this for now after moving controls to click,
+  // but it may come in handy later
+  // this.setAbilities = function(controlMetadata)
+  // {
+  //   this.abilityButtons = {};
+  //
+  //   var buttonSet = {};
+  //   buttonSet.backgroundButton = this.button1;
+  //   buttonSet.cdButton = this.button1cd;
+  //   this.abilityButtons[controlMetadata[0].name] = buttonSet;
+  //
+  //   buttonSet = {};
+  //   buttonSet.backgroundButton = this.button2;
+  //   buttonSet.cdButton = this.button2cd;
+  //   this.abilityButtons[controlMetadata[1].name] = buttonSet;
+  // };
 
-    var buttonSet = {};
-    buttonSet.backgroundButton = this.button1;
-    buttonSet.cdButton = this.button1cd;
-    this.abilityButtons[controlMetadata[0].name] = buttonSet;
-
-    buttonSet = {};
-    buttonSet.backgroundButton = this.button2;
-    buttonSet.cdButton = this.button2cd;
-    this.abilityButtons[controlMetadata[1].name] = buttonSet;
-  };
-
-  // I want to see what kind of perf impact this has, so starting pretty choppy
   this.triggerCooldown = function(cooldownInfo)
   {
     if(cooldownInfo.cooldown)
@@ -74,7 +67,7 @@ function ControlPanel(mainScene)
         }
         var completedFraction = Math.floor(96 * (counter++ / updateIntervals));
         indicator.applyStyle({"height": completedFraction + "%"});
-      }, interval); // update cd info every 5x / second
+      }, interval);
     }
   };
 
@@ -94,7 +87,9 @@ function ControlPanel(mainScene)
     power: "#1569C7"
   };
 
+  // uncomment for debug editor, but has some perf impacts
   //new IgeUiTimeStream().mount(self.scene);
+
   ige.ui.style(".rounded", {
     "borderRadius": 7
   });

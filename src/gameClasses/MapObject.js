@@ -2,8 +2,6 @@ function MapObject()
 {
   this.classId = "MapObject";
 
-  // on server create is passed from new Projectile(create),
-  // on client it comes from this.streamCreateData
   this.init = function(create)
   {
     var self = this;
@@ -24,20 +22,13 @@ function MapObject()
       this._physicsSettings.fixtures[0].shape.data = create.shapeData;
       this.box2dBody(this._physicsSettings);
 
-      // TODO: stream this to the client on init
-      // we never have to stream anything else about
-      // MapObjects ever because they won't change
-      //this.streamCreate(clientId);
+      // We only stream these entities down when they request the map
       this.streamMode(2);
-
-      // this.cellRow = create.cellRow;
-      // this.cellCol = create.cellCol;
     }
     else // ige.isClient
     {
       create = JSON.parse(create);
-      // this.cellRow = create.cellRow;
-      // this.cellCol = create.cellCol;
+
       this.height(create.height);
       this.width(create.width);
       this.depth(create.depth);
@@ -64,24 +55,9 @@ function MapObject()
     type: "static",
     allowSleep: true,
     fixtures: [{
-      shape: {
-        type: "rectangle"
-      }
+      shape: { type: "rectangle" }
     }]
   };
-
-  // TODO: I don't think this is appropriate if a class is
-  // using SheetManager as the sheets are shared, probably should
-  // trim this code from all of my classes relying on that now.
-  // this.destroy = function () {
-  //   // Destroy the texture object
-  //   if (this._projectileTexture) {
-  //     this._.destroy();
-  //   }
-  //
-  //   // Call the super class
-  //   IgeEntityBox2d.prototype.destroy.call(this);
-  // };
 }
 var MapObject = IgeEntityBox2d.extend(new MapObject());
 

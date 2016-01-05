@@ -2,20 +2,16 @@ function DamageField()
 {
   this.classId = "DamageField";
 
-  // on server create is passed from new Projectile(create),
-  // on client it comes from this.streamCreateData
   this.init = function(create)
   {
-    var self = this;
     IgeEntityBox2d.prototype.init.call(this);
+    var self = this;
 
     if(ige.isClient){ create = JSON.parse(create); }
 
     this.parentId = create.parentId;
     var parent = ige.$(create.parentId);
     this.activeSpan = create.activeSpan;
-
-    field = this;
 
     if(ige.isServer)
     {
@@ -67,9 +63,7 @@ function DamageField()
     fixtures: [{
       density: 1.0, friction: 0.0, restitution: 0.0,
       isSensor: true,
-      shape: {
-        type: "rectangle"
-      },
+      shape: { type: "rectangle" },
       filter: {
         categoryBits: 2,
         maskBits: 1
@@ -91,8 +85,9 @@ function DamageField()
     var self = this;
     if(ige.isServer)
     {
-      ige.network.send("activate", this.id());
       this._active = true;
+      ige.network.send("activate", this.id());
+
       for(var id in this._charactersInRange)
       {
         if(this._charactersInRange.hasOwnProperty(id))
@@ -145,16 +140,6 @@ function DamageField()
     {
       delete this._charactersInRange[id];
     }
-  };
-
-  this.destroy = function () {
-    // Destroy the texture object
-    if (this._fieldTexture) {
-      this._fieldTexture.destroy();
-    }
-
-    // Call the super class
-    IgeEntityBox2d.prototype.destroy.call(this);
   };
 }
 var DamageField = IgeEntityBox2d.extend(new DamageField());

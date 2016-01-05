@@ -6,24 +6,22 @@ function ClientNetworkMessage(name, onMessage)
 }
 
 var ClientNetworkEvents = {
-	listen: function() {
-		for(var i = 0; i < this.incoming.length; i++){
+	incoming: [],
+	listen: function()
+	{
+		for(var i = 0; i < this.incoming.length; i++)
+		{
 			var listener = this.incoming[i];
 			ige.network.define(listener.name, listener.onMessage);
 		}
-	},
-
-	incoming: []
+	}
 };
 
 function initPlayer(entityId, controlMetadata)
 {
-	// Add the player control component and track with camera
 	var player = ige.$(entityId);
 	player.addComponent(PlayerComponent, controlMetadata);
-	// have the camera follow the player
 	ige.client.vp1.camera.trackTranslate(player, 50);
-	// but start out viewing them
 	ige.client.vp1.camera.lookAt(player, 0);
 	ige.client.controlPanel.setAbilities(controlMetadata);
 	ige.client.controlPanel.trackStatus(player);

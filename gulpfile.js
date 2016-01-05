@@ -40,7 +40,6 @@ gulp.task("build", function() {
 
 gulp.task("server", ["server:socket", "server:static"]);
 gulp.task("server:socket", ["build"], function(){
-  // TODO: debug mode?
   socketServer().listen({
     path: "../ige/server/ige.js",
     args: ["-g", "./build"]

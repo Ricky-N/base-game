@@ -6,7 +6,7 @@ extend. You will probably want to call the super method like this:
 		{SuperClassName}.prototype.init.call(this);
 
 I attempted to merge this class system with new es6 classes and use Babel to
-have them talk, but was pretty unsuccessful. I don't believe there were problems
+have them talk, but was pretty unsuccessful. I believe there were problems
 with the export method and sort of gave up, but it may be worth a look in the future.
 
 For now, I recommend using module syntax to generate singleton objects which you
@@ -57,4 +57,4 @@ private variables and functions. An example class for this purpose:
 
 I would pretty strongly recommend setting the var and function to the same name.
 This basically gets rid of the class you just defined and replaces it with the
-IgeClass which has all the same methods, plus those its inherited from. 
+IgeClass which has all the same methods, plus those its inherited from.

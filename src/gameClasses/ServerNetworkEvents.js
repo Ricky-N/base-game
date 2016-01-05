@@ -16,13 +16,14 @@ var ServerNetworkEvents = {
 	incoming: []
 };
 
-var playerConnect = new ServerNetworkMessage("connect", function(socket){
+var playerConnect = new ServerNetworkMessage("connect", function(socket) {
 	// Don't reject the client connection, true would reject it
 	return false;
 });
 ServerNetworkEvents.incoming.push(playerConnect);
 
-var playerDisconnect = new ServerNetworkMessage("disconnect", function(clientId){
+var playerDisconnect = new ServerNetworkMessage("disconnect", function(clientId) {
+	// TODO: this doesn't seem to be working
 	if (ige.server.players[clientId]) {
 		// Remove the player from the game
 		ige.server.players[clientId].destroy();
@@ -34,7 +35,7 @@ var playerDisconnect = new ServerNetworkMessage("disconnect", function(clientId)
 });
 ServerNetworkEvents.incoming.push(playerDisconnect);
 
-var playerEntity = new ServerNetworkMessage("playerEntity", function(data, clientId){
+var playerEntity = new ServerNetworkMessage("playerEntity", function(data, clientId) {
 	if (!ige.server.players[clientId]) {
 		data.clientId = clientId;
 		ige.server.players[clientId] = new Character(data);
@@ -60,8 +61,7 @@ var buttonToAbility =
 	5: 3	// shift + right -> ability 4
 };
 
-var controlUpdate = new ServerNetworkMessage("controlUpdate", function(data, clientId){
-	// TODO: switch
+var controlUpdate = new ServerNetworkMessage("controlUpdate", function(data, clientId) {
 	var controls;
 	// if(data.type === "Press")
 	// {
@@ -101,7 +101,7 @@ var controlUpdate = new ServerNetworkMessage("controlUpdate", function(data, cli
 });
 ServerNetworkEvents.incoming.push(controlUpdate);
 
-var requestMap = new ServerNetworkMessage("requestMap", function(data, clientId, requestId){
+var requestMap = new ServerNetworkMessage("requestMap", function(data, clientId, requestId) {
 
 	// TODO: this should live on it's own server, almost like a CDN, but specifically
 	// to make sure we serve up static entities without fucking every other player

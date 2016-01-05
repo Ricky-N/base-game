@@ -1,6 +1,5 @@
 var igeClientConfig = {
 	include: [
-		/* Your custom game JS scripts */
 		"./gameClasses/SheetManager.js",
 		"./gameClasses/ClientNetworkEvents.js",
 		"./gameClasses/StatusComponent.js",
@@ -12,8 +11,6 @@ var igeClientConfig = {
 		"./gameClasses/ControlPanel.js",
 		"./gameClasses/MapObject.js",
 		"./gameClasses/Background.js",
-
-		/* Standard game scripts */
 		"./client.js",
 		"./index.js"
 	]

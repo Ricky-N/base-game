@@ -8,8 +8,6 @@ function Server()
 	{
 		var self = this;
 		ige.timeScale(1);
-
-		// TODO: we need a real set of gameworld objects to manage
 		this.players = {};
 
 		ige.addComponent(IgeNetIoComponent);
@@ -23,7 +21,8 @@ function Server()
 			.box2d.start();
 
 
-		// TODO: this doesn't feel like the right place for this anymore..
+		// TODO: Move into its own module along with other physics info like
+		// global physics parameters, and the init stuff above
 		function handleProjectileCollision(entityA, classA, entityB, classB)
 		{
 			if(classA === "Projectile")
@@ -46,7 +45,7 @@ function Server()
 		};
 
 		ige.box2d.contactListener(
-			// Listen for when contact begin
+			// contact begins listener
 			function (contact)
 			{
 				if(contact.igeEntityA().classId() === "DamageField" &&
@@ -71,7 +70,7 @@ function Server()
 					contact.igeEntityB()
 				);
 			},
-			// Listen for when contact end
+			// contact ends listener
 			function (contact)
 			{
 				if(contact.igeEntityA().classId() === "DamageField" &&
@@ -103,14 +102,12 @@ function Server()
 			}
 		);
 
-		// Because of the way inheritance is handled here, moving
-		// this anonymous function out is insanely hard. Good Luck :)
 		ige.network.start(this.port, function (){
-			// Networking has started so start the game engine
+
 			ige.start(function(success){
-				// Check if the engine started successfully
-				if (success) {
-					// begin listening to incoming network events
+
+				if (success)
+				{
 					ServerNetworkEvents.listen();
 					ige.network.addComponent(IgeStreamComponent)
 						 .stream.sendInterval(50)
@@ -124,10 +121,6 @@ function Server()
 						.mount(self.mainScene);
 
 					self.background = new Background(self.mainScene);
-
-					// Create the main viewport and set the scene
-					// it will "look" at as the new scene1 we just
-					// created above
 					self.vp1 = new IgeViewport()
 						.id("vp1")
 						.autoSize(true)
