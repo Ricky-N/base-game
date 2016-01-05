@@ -99,41 +99,41 @@ function Background(mainScene){
       }
       else
       {
-        // TODO: generate this in our postprocess of the json file.
-        var objectMapping = {
-          21: {
-            "sheetData":{
-              "location": "./official/tree.png",
-              "columns": 2,
-              "rows": 1,
-              "cell": 1
-            },
-            "height": 192,
-            "width": 128,
-            "shapeData": {
-              "x": 0,
-              "y": 60,
-              "width": 30,
-              "height": 32,
-            }
-          },
-          22: {
-            "sheetData":{
-              "location": "./official/tree.png",
-              "columns": 2,
-              "rows": 1,
-              "cell": 2
-            },
-            "height": 192,
-            "width": 128,
-            "shapeData": {
-              "x": 0,
-              "y": 60,
-              "width": 30,
-              "height": 32,
-            }
-          }
-        };
+        // // TODO: generate this in our postprocess of the json file.
+        // var objectMapping = {
+        //   21: {
+        //     "sheetData":{
+        //       "location": "./official/tree.png",
+        //       "columns": 2,
+        //       "rows": 1,
+        //       "cell": 1
+        //     },
+        //     "height": 192,
+        //     "width": 128,
+        //     "shapeData": {
+        //       "x": 0,
+        //       "y": 60,
+        //       "width": 30,
+        //       "height": 32,
+        //     }
+        //   },
+        //   22: {
+        //     "sheetData":{
+        //       "location": "./official/tree.png",
+        //       "columns": 2,
+        //       "rows": 1,
+        //       "cell": 2
+        //     },
+        //     "height": 192,
+        //     "width": 128,
+        //     "shapeData": {
+        //       "x": 0,
+        //       "y": 60,
+        //       "width": 30,
+        //       "height": 32,
+        //     }
+        //   }
+        // };
 
         // for now we assume baselayer is always a client texture, they need
         // to display something! but everything else is fair game to remove
@@ -142,7 +142,7 @@ function Background(mainScene){
           var data = Map.layers[i].data;
           for(j = 0; j < data.length; j++)
           {
-            var mapping = objectMapping[data[j]];
+            var mapping = Map.tilephysics[data[j]];
             if(typeof mapping !== "undefined")
             {
               // position is tricky here as the Tiled information will come
@@ -188,6 +188,7 @@ function Background(mainScene){
     {
       Map.layers.remove(layersToRemove[i]);
     }
+    delete Map.tilephysics;
   }
 
   return self;
