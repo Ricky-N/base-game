@@ -1,8 +1,21 @@
+/** @class
+ * A generic type of ability which has a cost, a cooldown, and can
+ * be used. If the cost is not met, use will fail. The onUse Function
+ * must be overridden by children when a new type of ability is created.
+ */
 function Ability()
 {
   this.classId = "Ability";
   this.controlType = "PressControl";
 
+  /**
+   * Initializes the Ability, should be called by children
+   * @param {string} name the ability name
+   * @param {object} entity the entity this ability is associated with
+   * @param {number} cooldown cooldown time in ms
+   * @param {string} costType ability accessor for one of AbilityCostFunctions
+   * @param {number} cost the cost in units of the costType
+   */
   this.init = function(name, entity, cooldown, costType, cost)
   {
     this.name = name;
@@ -15,6 +28,10 @@ function Ability()
     this.cost = cost;
   };
 
+  /**
+   * Whether the ability is on cooldown or not
+   * @returns {boolean} true if on cooldown
+   */
   this.onCooldown = function()
   {
     if(!this._onCooldown)
@@ -30,11 +47,19 @@ function Ability()
     }
   };
 
+  /**
+   * cooldown time accessor
+   * @returns length of time in ms until cooldown is up
+   */
   this.cooldownTime = function()
   {
     return ige.lastTick - this._lastUsed;
   };
 
+  /**
+   * Checks if the ability is ready for use and if so calls onUse
+   * @return {number} new cooldown time if used
+   */
   this.use = function(arg)
   {
     if(!this.onCooldown() && this.useCost())
@@ -48,7 +73,7 @@ function Ability()
   };
 
   /**
-   * If possible, claims cost for using this ability
+   * if possible, claims cost for using this ability
    * @return {Boolean} whether possible to use the ability
    */
   this.useCost = function()
@@ -57,7 +82,7 @@ function Ability()
   };
 
   /**
-   * Function called when ability is used, off cooldown, and useCost is satisfied
+   * function called when ability is used, off cooldown, and useCost is satisfied
    */
   this.onUse = function()
   {
@@ -66,6 +91,12 @@ function Ability()
 }
 var Ability = IgeClass.extend(new Ability());
 
+/**
+ * Dictionary of ability cost functions that may be shared
+ * across many different abilities
+ * @property {function(object, number):boolean} power given the cost, returns
+ *  whether an ability can be used or not
+ */
 var AbilityCostFunctions = {
   power: function(entity, cost)
   {
@@ -79,11 +110,21 @@ var AbilityCostFunctions = {
   }
 };
 
+/**
+ * A special type of ability which spawns a projectile in
+ * the direction specified by a given point. Information about
+ * the projectile must be assigned to this to work properly
+ * @augments Ability
+ * @class
+ */
 function ProjectileAbility()
 {
   this.classId = "ProjectileAbility";
   this.controlType = "ToggleClickControl";
 
+  /**
+   * Initializes the ProjectileAbility, see Ability for params
+   */
   this.init = function(name, entity, cooldown, costType, cost)
   {
     Ability.prototype.init.call(this, name, entity, cooldown, costType, cost);
@@ -110,16 +151,27 @@ function ProjectileAbility()
     new Projectile(this.projectileInfo);
   };
 
-  // default projectileInfo must be overridden with appropriate
-  // projectile properties for this to work. Left this way to help
-  // speed things up a bit on initialization
-  // this.projectileInfo = {
+  /**
+   * default projectileInfo must be overridden with appropriate
+   * projectile properties for this to work. Left blank to help
+   * speed things up a bit on initialization
+   * @property {string} category probably useless
+   * @property {number} speed the speed of the projectile
+   * @property {number} height the height of the hitbox
+   * @property {number} width the width of the hitbox
+   * @property {number} damage the amount of damage dealt on hit
+   * @property {number} lifespan the time in ms this projectile is alive
+   * @property {number} cellRow the row in the cellsheet
+   * @property {number} cellCol the column in the cellsheet
+   */
+  this.projectileInfo = {};
   //   category: "large", speed: 0.5, height: 32, width: 32,
   //   damage: 23, lifeSpan: 900, cellRow: 13, cellCol: 4
   // };
 }
 var ProjectileAbility = Ability.extend(new ProjectileAbility());
 
+// TODO: refactor into real classes and document
 function Daggers(entity)
 {
   var daggers = new ProjectileAbility("daggers", entity, 2000, "power", 10);
@@ -226,6 +278,7 @@ function Explosion(entity)
   return explosion;
 }
 
+/** Maps from client provided options to ability constructors */
 var optionMapping = {
   "daggers": Daggers,
   "spikes": Spikes,
@@ -235,9 +288,12 @@ var optionMapping = {
   "explosion": Explosion
 };
 
-// AbilityComponent is server side only because we don't want every
-// player to be able to see every other player's abilities or ability
-// metadata. Instead we just send it on character init to only that player
+/**
+ * Server side only component of a character that gives it abilities.
+ * kept hidden from the clients so that they can't determine anything
+ * about their opponents before seeing the ability happen.
+ * @class
+ */
 function AbilityComponent()
 {
    this.classId = "AbilityComponent";

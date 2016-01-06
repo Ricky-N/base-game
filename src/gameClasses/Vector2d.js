@@ -1,3 +1,9 @@
+/**
+ * A simple 2d vector representation
+ * @constructor
+ * @param {number} x the vector x coordinate
+ * @param {number} y the vector y coordinate
+ */
 function Vector2d(x,y)
 {
   this.x = x;
