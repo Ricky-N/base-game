@@ -299,6 +299,13 @@ function AbilityComponent()
    this.classId = "AbilityComponent";
    this.componentId = "abilitySet";
 
+   /**
+    * Initialize a new AbilityComponent for a character. This should not be
+    * called directly but through the entity's addComponent method.
+    * @param {object} entity the entity this component is being added to
+    * @param {object} options should have a property abilities that switches which
+    *   abilities are initialized for this component
+    */
    this.init = function (entity, options) {
     var self = this;
 
@@ -329,6 +336,7 @@ function AbilityComponent()
       abilityChoices = defaults;
     }
 
+    /** the set of abilities in this AbilityComponent */
     this.abilities = [];
     for(i = 0; i < abilityChoices.length; i++)
     {
@@ -336,7 +344,12 @@ function AbilityComponent()
     }
   };
 
-  // currently unused, but useful if we get off of click controls again
+  /**
+   * Used to get required information about the character's abilities to
+   * initialize their PlayerComponent. Currently not relied on as all abilities
+   * have been mapped to the homogenous click controls, but is the methods
+   * to support PressControls, ToggleClickControls, etc.
+   */
   this.getControlMetadata = function()
   {
     var ret = [];
@@ -350,10 +363,12 @@ function AbilityComponent()
     return ret;
   };
 
-  // for things like projectiles we don't want to create a new
-  // cell sheet every time the projectile is created, but we also
-  // don't have a client side abilitySet to hold the reference. We
-  // will pass back info here that the server can ship down
+  /**
+   * Returns information about cellsheets from the abilities in this
+   * AbilityComponent which we may want to initialize before the ability is
+   * called. This helps make sure that we aren't duplicating work to init
+   * cellsheets or doing it during the spawn time of a short lived entity.
+   */
   this.getCellSheetInfo = function()
   {
     var cellSheetInfo = [];

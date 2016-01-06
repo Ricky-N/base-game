@@ -1,7 +1,17 @@
+/**
+ * An entity which can move, has abilities, and a set of cellsheet based
+ * animations. If a PlayerComponent is added it represents a player.
+ * @class
+ */
 function Character()
 {
 	this.classId = "Character",
 
+	/**
+	 * Initialize a character
+	 * @param {object} createData on the client this comes from calling
+	 * 	streamCreateData on this entity, on the server it is currently unused
+	 */
 	this.init = function (createData)
 	{
 		var self = this;
@@ -17,6 +27,8 @@ function Character()
 		// this one, so we have to remap the translate
 		this._translateToProtoChar = this.translateTo;
 		this.translateTo = this._translateToChar;
+
+		/** entities that will be translated with this character */
 		this.followingChildren = [];
 
 		// for now lets start everyone a little into the map
@@ -27,6 +39,8 @@ function Character()
 		{
 			this.height(48);
 			this.width(32);
+
+			/** speed of the entity when moving */
 			this._speed = 0.18;
 
 			this.addComponent(AbilityComponent, createData);
@@ -61,6 +75,10 @@ function Character()
 		this._lastTranslate = this._translate.clone();
 	};
 
+	/**
+	 * The translateTo override method that ensures followingChildren
+	 * are moved along with this character
+	 */
 	this._translateToChar = function (x, y, z) {
 		this._translateToProtoChar(x, y, z);
 
@@ -78,6 +96,7 @@ function Character()
 		return this;
 	};
 
+	/** box2d physics setting for this character's body */
 	this._physicsSettings = {
 		type: "dynamic",
 		linearDamping: 2,
@@ -94,9 +113,13 @@ function Character()
 		}]
 	};
 
-	// set should only be called from client,
-	// get should only be called from server,
-	// set basically undoes get to apply it locally
+	/**
+	 * accessor pattern for the streaming data, should provide data to be
+	 * streamed down to the clients when called parameterless on the Server
+	 * and set the same data when called from the client
+	 * @param {object} data the streamed data to set if present, if undefined returns
+	 * 	data to stream
+	 */
 	this._characterStreamData = function(data)
 	{
 		if(typeof data !== "undefined")
@@ -113,6 +136,13 @@ function Character()
 		}
 	};
 
+	/**
+	 * accessor pattern for streamed initialization data that will
+	 * provide data on the server to stream to the client and set the
+	 * same data on the client
+	 * @param {object} data the streamed init data to set if present,
+	 * 	if undefined it will return data to stream
+	 */
 	this.streamCreateData = function(data)
 	{
 		if(typeof data !== "undefined")
@@ -132,6 +162,14 @@ function Character()
 		}
 	};
 
+	/**
+	 * Override function that gets called each stream update period to get data
+	 * that should be sent to the client on the server side, or on the client to
+	 * set the data received. This is required to handle our custom stream section
+	 * "status", or pass through to the default streamSectionData function.
+	 * @param {string} sectionId the id of the section being streamed
+	 * @param {object} if present, data from server to set, else requesting data
+	 */
 	this.streamSectionData = function(sectionId, data)
 	{
 		if(sectionId === "status")
@@ -153,8 +191,11 @@ function Character()
     }
 	};
 
-	// Sets the type of character which determines the character's
- 	// animation sequences and appearance.
+	/**
+	 * Sets the type of character which determines the character's
+ 	 * animation sequences and appearance.
+	 * @param {number} skin value (0 - 6)
+	 */
 	this.skin = function (skin)
 	{
 		if(typeof skin === "undefined")
@@ -253,6 +294,12 @@ function Character()
 		}
 	};
 
+	/**
+	 * override function called each tick to update current animation
+	 * based on player movement before calling the default
+	 * @param {obj} ctx the canvas context
+	 * @param {number} tickDelta the time difference in ticks from last call
+	 */
 	this.update = function (ctx, tickDelta) {
 		if (ige.isClient) {
 			// Set the current animation based on direction

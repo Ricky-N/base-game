@@ -1,7 +1,19 @@
+/**
+ * An entity that will never move throughout its lifetime, but
+ * still impacts the physics simulation and should be depth sorted,
+ * making it inherently different from a map tile texture
+ * @class
+ */
 function MapObject()
 {
   this.classId = "MapObject";
 
+  /**
+   * Initialize a MapObject
+   * @param {object} create an object with sufficient information to load
+   *  the required cellsheet, properly render on the client, and properly
+   *  set body physics properties on the server
+   */
   this.init = function(create)
   {
     var self = this;
@@ -11,8 +23,10 @@ function MapObject()
     {
       this.translateTo(create.position.x, create.position.y, 0);
 
-      // lets set depth at the center of mass of the static object, with a slight
-      // randomness so side-by-side overlapping objects work out right
+      /**
+       * depth is set to the center of the provided physics shape for
+       * this object, with some slight added randomness for overlapping objects
+       */
       this.depth = create.position.y + create.shapeData.y + Math.random();
       this.sheetData = create.sheetData;
       this.mount(ige.server.foregroundScene);
@@ -22,7 +36,7 @@ function MapObject()
       this._physicsSettings.fixtures[0].shape.data = create.shapeData;
       this.box2dBody(this._physicsSettings);
 
-      // We only stream these entities down when they request the map
+      /** We only stream these entities down on a network map request */
       this.streamMode(2);
     }
     else // ige.isClient
@@ -41,6 +55,7 @@ function MapObject()
     }
   };
 
+  /** Called to get stream init data, passed to init on client */
   this.streamCreateData = function()
   {
     return JSON.stringify({
@@ -51,6 +66,7 @@ function MapObject()
     });
   };
 
+  /** Basic static physics settings common to all MapObjects */
   this._physicsSettings = {
     type: "static",
     allowSleep: true,

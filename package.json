@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "gulp server",
-    "publish": "jsdoc src/gameClasses/Vector2d.js -o docs"
+    "build": "jsdoc src -d docs -R readme.md -r"
   },
   "keywords": [
     "Isogenic",
