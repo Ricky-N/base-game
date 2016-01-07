@@ -1,3 +1,8 @@
+/**
+ * A simple abstraction for communication that the server may receive which
+ * would be targeted at a command name and trigger a function.
+ * @class
+ */
 function ServerNetworkMessage(name, onMessage)
 {
 	this.name = name;
@@ -5,15 +10,21 @@ function ServerNetworkMessage(name, onMessage)
 	return this;
 }
 
+/**
+ * All events the server may receve must come through this object, being
+ * added to the listen property, calling listen after initializing the
+ * network will begin handling those events.
+ * @property {object} incoming the array of ServerNetworkMessage
+ * @property {function} listen begin listening for messages
+ */
 var ServerNetworkEvents = {
+	incoming: [],
 	listen: function() {
 		for(var i = 0; i < this.incoming.length; i++){
 			var listener = this.incoming[i];
 			ige.network.define(listener.name, listener.onMessage);
 		}
-	},
-
-	incoming: []
+	}
 };
 
 var playerConnect = new ServerNetworkMessage("connect", function(socket) {

@@ -1,10 +1,24 @@
+/**
+ * A simple encapsulation of the name of a command
+ * and the callback when it is received
+ * @class
+ */
 function ClientNetworkMessage(name, onMessage)
 {
+	/** The command name that will trigger the callback */
 	this.name = name;
+	/** The callback for when the command is received */
 	this.onMessage = onMessage;
 	return this;
 }
 
+/**
+ * All events the client may receve must come through this object, being
+ * added to the listen property, calling listen after initializing the
+ * network will begin handling those events.
+ * @property {object} incoming the array of ClientNetworkMessage
+ * @property {function} listen begin listening for messages
+ */
 var ClientNetworkEvents = {
 	incoming: [],
 	listen: function()

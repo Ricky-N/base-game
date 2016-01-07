@@ -1,9 +1,21 @@
-// TODO: Perf problems creating and destroying these, make an initialized
-// entity pool to deal with projectiles instead
+/**
+ * A short lived entity that flies through space in a specific
+ * direction and on collision causes damage, and will be destroyed
+ * shortly after.
+ * TODO: Perf problems creating and destroying these, make an initialized
+ * entity pool to deal with projectiles instead
+ * @class
+ */
 function Projectile()
 {
   this.classId = "Projectile";
 
+  /**
+   * Initializer a projectile
+   * @param {object} create requires initial positon, speed, height and
+   * width, damage, and a direction it is travelling along with the cellRow
+   * and cellCol in the projectile cellsheet for this entity.
+   */
   this.init = function(create)
   {
     var self = this;
@@ -61,7 +73,7 @@ function Projectile()
       lifeSpan: this.lifeSpan()
     });
   };
-
+  
   this._physicsSettings = {
     type: "dynamic",
     linearDamping: 0.0,

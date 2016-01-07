@@ -1,14 +1,28 @@
-// There are certain things like projectiles that we spawn
-// many times where the CellSheet / SpriteSheet will be the
-// same across every instance. We can use a global sheet
-// manager in these cases to keep this from getting too bad.
+/**
+ * Creates shared cellsheets so that we don't have to continually
+ * create / destroy cellsheets for common image sets. This can be
+ * especially helpful with entities like projectiles where they
+ * may be created for only a short time and we want to ensure the
+ * images are loaded well before they are created and that entity init
+ * time does not take too long for the client.
+ * @class
+ */
 function SheetManager()
 {
   var self = this;
 
+  /** The set of cellsheets currently managed by the SheetManager */
   this.sheets = {};
 
-  // use this if you don't care about the sheet but want to get it loaded
+  /**
+   * Trigger the SheetManager to load a given sheet so that other classes
+   * will be able to call a preloaded one. Useful when you want to make sure
+   * that a short lived entity will be visible on its first initialization.
+   * This should be called when the caller doesn't care about the cellsheet.
+   * @param {string} name the server location of the cellsheet
+   * @param {number} columns the number of columns in the cellsheet
+   * @param {number} rows the number of rows in the cellsheet
+   */
   this.loadSheet = function(name, columns, rows)
   {
     if(!this.sheets.hasOwnProperty(name))
@@ -31,9 +45,16 @@ function SheetManager()
     }
   };
 
-  // call this if you want the sheet once it is loaded, if you are sure
-  // that you are calling this after it has been loaded, you can omit
-  // columns and rows, but it will error if you are wrong :)
+  /**
+   * Trigger the SheetManager to load a given sheet, cache it for other
+   * requests for the same sheet, and call when the sheet is ready.
+   * @param {string} name the server location of the cellsheet
+   * @param {function(CellSheet)} func the callback to be called with the sheet
+   * @param {number} columns the number of columns in the cellsheet, optional
+   *  if you are certain the sheet has been preloaded
+   * @param {number} rows the number of rows in the cellsheet, optional
+   *  if you are certain the sheet has been preloaded
+   */
   this.registerCallback = function(name, func, columns, rows)
   {
     if(!this.sheets.hasOwnProperty(name))

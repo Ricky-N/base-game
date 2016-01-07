@@ -1,7 +1,19 @@
+/**
+ * An area with a physics sensor on the server and animation on
+ * the client that tracks when characters enter and leave it's area.
+ * Can be activated so that damage is dealt to anything in the area
+ * while it is activated, and the animation is displayed
+ * @class
+ */
 function DamageField()
 {
   this.classId = "DamageField";
 
+  /**
+   * Initialize a DamageField
+   * @param {object} create on server should have a position, activeSpan
+   *   damage amount, and parent if the parent should not receive damage
+   */
   this.init = function(create)
   {
     IgeEntityBox2d.prototype.init.call(this);
@@ -53,6 +65,12 @@ function DamageField()
     }
   };
 
+  /**
+   * Physics settings for the damage field. The damage field has
+   * only a single fixture which is a sensor, meaning that it does
+   * not collide with other objects, but still triggers when objects
+   * would begin collision or leave.
+   */
   this._physicsSettings = {
     type: "kinematic",
     linearDamping: 0.0,
@@ -81,6 +99,12 @@ function DamageField()
     });
   };
 
+  /**
+   * Activate the damage field for the activeSpan ms, hurting anything
+   * that is already in the area or anything that enters the area while
+   * it is active, and triggering the animation on the client
+   * @param {Vector2d} position the location this should be centered at
+   */
   this.activate = function(position)
   {
     var self = this;
@@ -113,6 +137,10 @@ function DamageField()
     }
   };
 
+  /**
+   * Deactivate the DamageField, currently does not communicate
+   * with the client to stop animation.
+   */
   this.deactivate = function()
   {
     if(ige.isServer)
@@ -121,6 +149,12 @@ function DamageField()
     }
   };
 
+  /**
+   * Call when a character enters the DamageField range, if it is
+   * active they will be hurt unless they are the parent, if inactive
+   * they will be added to the set of characters in the range.
+   * @param {number} id the id of the character that entered the range
+   */
   this.characterEnteredRange = function(id)
   {
     if(id !== this.parentId)
@@ -137,6 +171,10 @@ function DamageField()
     }
   };
 
+  /**
+   * The opposite of entering the range
+   * @param {number} id the id of the character leaving the range
+   */
   this.characterLeftRange = function(id)
   {
     if(id !== this.parentId)

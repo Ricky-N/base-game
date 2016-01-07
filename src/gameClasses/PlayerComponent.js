@@ -2,16 +2,22 @@
  * This type of control has a single state variable and is either active
  * or inactive. If activated when it was inactive, it will call onActivation
  * otherwise it will do nothing. Deactivation acts the same way but in reverse.
+ * @class
  */
 function Control()
 {
 	this.classId = "Control";
 
+	/** Initialize a Control */
 	this.init = function()
 	{
 		this._active = false;
 	};
 
+	/**
+	 * Called to try to ativate the control, but nothing will happen
+	 * if the control is already active
+	 */
 	this.activate = function()
 	{
 		if(!this._active)
@@ -21,11 +27,19 @@ function Control()
 		}
 	};
 
+	/**
+	 * Called when a control is flipped from state inactive to active,
+	 * must be overridden by child Control classes
+	 */
 	this.onActivation = function()
 	{
 		throw "Must be overridden by child classes";
 	};
 
+	/**
+	 * Called to try to deactivate the control, though if the control
+	 * is already deactivated it will do nothing
+	 */
 	this.deactivate = function()
 	{
 		if(this._active)
@@ -35,6 +49,10 @@ function Control()
 		}
 	};
 
+	/**
+	 * Called when the control is flipped from active to inactive,
+	 * must be overridden by child Control classes
+	 */
 	this.onDeactivation = function()
 	{
 		throw "Must be overridden by child classes";
@@ -46,11 +64,20 @@ var Control = IgeClass.extend(new Control());
  * A PressControl is a Control that is pressed to try to use the
  * assigned action for the duration of time it is pressed, and released
  * to do nothing. When pressed it is on.
+ * @class
  */
 function PressControl()
 {
 	this.classId = "PressControl";
 
+	/**
+	 * Initialize a PressControl
+	 * @param {string} action the action name we want this to map to
+	 * @param {number} key the key that activates this control
+	 * @param {object} ability the ability this activates, if applicable
+	 * @param {string} networkVerb if a custom type sent to the server is
+	 * 	desired, this should be provided, else it will be "Press"
+	 */
 	this.init = function(action, key, ability, networkVerb)
 	{
 		Control.prototype.init.call(this);
@@ -60,13 +87,16 @@ function PressControl()
 		this.networkVerb = networkVerb ? networkVerb : "Press";
  	};
 
-	// we don't want to get in a state where the client and
-	// server are on opposite sides of the same toggle so send
-	// the value directly
+	/**
+	 * Informs the server of an update to this PressControl state
+	 */
 	this.updateFunc = function()
 	{
 		if(ige.isClient)
 		{
+			// we don't want to get in a state where the client and
+			// server are on opposite sides of the same toggle so send
+			// the value directly
 			var data = {
 				"type": this.networkVerb,
 				"control": this.action,
@@ -76,11 +106,13 @@ function PressControl()
 		}
 	};
 
+	/** Called when the PressControl is activated */
 	this.onActivation = function()
 	{
 		this.updateFunc();
 	};
 
+	/** Called when the PressControl is deactivated */
 	this.onDeactivation = function()
 	{
 		this.updateFunc();
@@ -268,11 +300,24 @@ function checkControls(controls)
 // }
 // var ToggleClickControlSet = IgeClass.extend(new ToggleClickControlSet());
 
+/**
+ * The player controls that get added to a character through addComponent(PlayerComponent)
+ * and will after be accessible through character.playerControl. This encapsulates
+ * all controls a user can have, and deals with the ones which don't have a distinct
+ * action that can be taken when the control message is received.
+ * @class
+ */
 function Controls()
 {
 	this.classId = "PlayerComponent";
 	this.componentId = "playerControl";
 
+	/**
+	 * Initialize a PlayerComponent
+	 * @param {object} entity the entity this component is attaching to
+	 * @param {object} controlMetadata currently unusued, but useful for abstracting
+	 * 	the types of things a user can do and building controls for them
+	 */
 	this.init = function (entity, controlMetadata)
 	{
 		var self = this;
@@ -286,6 +331,16 @@ function Controls()
 		// 	{ name: "action2", key: ige.input.key.e }
 		// ];
 
+		/**
+		 * The set of PressControl that represent player movement and will
+		 * be checked each behaviour tick. Direction controls are unique PressControls
+		 * in that the send back a "Direction" type of message to the server so
+		 * that we can handle them more practically.
+		 * @property {PressControl} left the left control, static mapping to a key
+ 		 * @property {PressControl} right the left control, static mapping to d key
+ 		 * @property {PressControl} up the left control, static mapping to w key
+ 		 * @property {PressControl} down the left control, static mapping to s key
+		 */
 		this.directionControls = {
 			left: new PressControl("left", ige.input.key.a, {}, "Direction"),
 			right: new PressControl("right", ige.input.key.d, {}, "Direction"),
@@ -393,7 +448,7 @@ function Controls()
 				{
 					vel = controlVec;
 				}
-				
+
 				// TODO: do we need velocity component when we have box2d?
 				//this._box2dBody.SetLinearVelocity(vel);
 				this.velocity.x(vel.x);
