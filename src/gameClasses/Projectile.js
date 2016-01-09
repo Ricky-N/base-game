@@ -21,6 +21,7 @@ function Projectile()
     var self = this;
     IgeEntityBox2d.prototype.init.call(this);
 
+		/* CEXCLUDE */
     if(ige.isServer)
     {
       this.speed = create.speed;
@@ -48,7 +49,8 @@ function Projectile()
       var rotation = Math.atan2(direction.x, -direction.y) + Math.PI/2;
       this.rotateTo(0,0, rotation);
     }
-    else // ige.isClient
+		/* CEXCLUDE */
+    if(ige.isClient)
     {
       create = JSON.parse(create);
       this.cellRow = create.cellRow;
@@ -65,6 +67,7 @@ function Projectile()
     this.lifeSpan(create.lifeSpan);
   };
 
+	/* CEXCLUDE */
   this.streamCreateData = function()
   {
     return JSON.stringify({
@@ -73,7 +76,7 @@ function Projectile()
       lifeSpan: this.lifeSpan()
     });
   };
-  
+
   this._physicsSettings = {
     type: "dynamic",
     linearDamping: 0.0,
@@ -91,6 +94,7 @@ function Projectile()
       }
     }]
   };
+	/* CEXCLUDE */
 }
 var Projectile = IgeEntityBox2d.extend(new Projectile());
 

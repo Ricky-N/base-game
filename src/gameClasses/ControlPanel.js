@@ -61,7 +61,9 @@ function ControlPanel(mainScene)
         {
           clearInterval(intervalId);
         }
-        var completedFraction = Math.floor(96 * (counter++ / updateIntervals));
+
+        var completedFraction = Math.floor(96 * counter / updateIntervals);
+        counter += 1; // deploy doesn't like this being inline
         indicator.applyStyle({"height": completedFraction + "%"});
       }, interval);
     }

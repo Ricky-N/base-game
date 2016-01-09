@@ -48,7 +48,45 @@ gulp.task("server:socket", ["build"], function(){
 gulp.task("server:static", function() {
   gulp.src(["build", "../ige", "assets"])
     .pipe(staticServer()({
-      fallback: "index.html"
+      fallback: "devIndex.html"
+    }));
+});
+
+// this build, deploy, serve setup simulates test/prod
+// servers more accurately but makes iteration and
+// debugging impossible
+gulp.task("deploy", ["build"], function(){
+  // index is sourced from in ige/server/deploy/index.html
+  // as it has slightly different requirements.
+  // gulp.src("src/index.html")
+  //   .pipe(gulp.dest("deploy"));
+
+  // the deploy script needs to execute in that context
+  var cwd = process.cwd();
+  var to = cwd + '/deploy';
+  process.chdir('../ige');
+
+  // follows same setup process as server/ige.js
+  // simulate arguments so it deploys instead of runs
+  var command = "node ige.js -index true -deploy ../base-game/build -to " + to;
+  process.argv = command.split(' ');
+  IgeBase = require('..\\ige\\engine\\core\\IgeBase');
+  IgeClass = require('..\\ige\\engine\\core\\IgeClass');
+  IgeNode = require('..\\ige\\server\\IgeNode');
+  var igeNode = new IgeNode();
+
+  // reset the context before returning so we don't
+  // screw up any future task's execution
+  process.chdir(cwd);
+  return;
+});
+
+// TODO: this is very duplicat-y, is there a better way?
+gulp.task("server:deploy", ["server:socket", "server:deploy:static"]);
+gulp.task("server:deploy:static", ["deploy"], function() {
+  gulp.src(["deploy", "assets"])
+    .pipe(staticServer()({
+      fallback: "deploy/index.html"
     }));
 });
 

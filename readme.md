@@ -4,7 +4,7 @@ The north star for this game is that we want players to be able to define their 
 
 Some choices may seem strange, but help realize this goal, for instance a character does not have an abilitySet on the client side. This is because we don't want anyone to know anything about other player's abilities, even if they scraped non-visible data.
 
-Eventually the goal is to use a micro transaction model to sell special player and ability skins, but this relies on combat being fun and gameplay being compelling first :) (and those damn azure servers working). 
+Eventually the goal is to use a micro transaction model to sell special player and ability skins, but this relies on combat being fun and gameplay being compelling first :) (and those damn azure servers working).
 
 ## Setup
 
@@ -19,7 +19,7 @@ Once you've done the above, you should be able enter "gulp" from the command lin
 
 ## The Basics
 
-This project revolves around 2 different web servers. The first is a simple http server hosted by gulp for now, this is started by "gulp server:static". The second is a tcp socket connection managed by IGE that is started by "gulp server:socket". If you haven't got the ige repo available in the next directory up, this is going to hit problems as it assumes the engine code is there to serve up to the client. Running "gulp server" will start both of these up, or you can just run "gulp watch" to start both and then listen for file changes and restart the socket server when appropriate. Gulp only manages these servers in development, there is a separate set up for production / test servers. Once you do "gulp server" or "gulp watch", localhost:8000 should serve up assets, src, and ../ige folders and default to src/index.html. localhost:2000 should be your socket port, but the client will handle this connection.
+This project revolves around 2 different web servers. The first is a simple http server hosted by gulp for now, this is started by "gulp server:static". The second is a tcp socket connection managed by IGE that is started by "gulp server:socket". If you haven't got the ige repo available in the next directory up, this is going to hit problems as it assumes the engine code is there to serve up to the client. Running "gulp server" will start both of these up, or you can just run "gulp watch" to start both and then listen for file changes and restart the socket server when appropriate. Gulp only manages these servers in development, there is a separate set up for production / test servers. Once you do "gulp server" or "gulp watch", localhost:8000 should serve up assets, src, and ../ige folders, note that for development you have to specifically go to devIndex.html thanks to a bug in gulp-webserver. localhost:2000 should be your socket port, but the client will handle this connection.
 
 ### Architecture
 

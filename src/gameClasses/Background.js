@@ -14,6 +14,7 @@ function Background(mainScene){
     .layer(0)
     .mount(mainScene);
 
+	/* CEXCLUDE */
   this._physicsProperties = {
     type: "static",
     allowSleep: true,
@@ -23,6 +24,7 @@ function Background(mainScene){
       }
     }]
   };
+	/* CEXCLUDE */
 
   // things that aren't this size won't render
   // the way we want them to on the client, they
@@ -54,7 +56,8 @@ function Background(mainScene){
       });
     });
   }
-  else // ige.isServer
+	/* CEXCLUDE */
+  if(ige.isServer)
   {
     // We have a couple of goals here:
     // 1. Things that need to be depth sorted (trees) need to be
@@ -154,7 +157,7 @@ function Background(mainScene){
     }
     delete Map.tilephysics;
   }
-
+	/* CEXCLUDE */
   return self;
 }
 

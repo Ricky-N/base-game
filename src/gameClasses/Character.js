@@ -35,6 +35,7 @@ function Character()
 		this.translate().x(300);
 		this.translate().y(1885);
 
+		/* CEXCLUDE */
 		if (ige.isServer)
 		{
 			this.height(48);
@@ -54,7 +55,8 @@ function Character()
 			this.mount(ige.server.foregroundScene);
 			this.streamMode(1);
 		}
-		else // ige.isClient
+		/* CEXCLUDE */
+		if(ige.isClient)
 		{
 			this.addComponent(IgeAnimationComponent).depth(1);
 

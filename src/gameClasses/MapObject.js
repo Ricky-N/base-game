@@ -19,6 +19,7 @@ function MapObject()
     var self = this;
     IgeEntityBox2d.prototype.init.call(this);
 
+		/* CEXCLUDE */
     if(ige.isServer)
     {
       this.translateTo(create.position.x, create.position.y, 0);
@@ -39,7 +40,8 @@ function MapObject()
       /** We only stream these entities down on a network map request */
       this.streamMode(2);
     }
-    else // ige.isClient
+		/* CEXCLUDE */
+    if(ige.isClient)
     {
       create = JSON.parse(create);
 
@@ -55,6 +57,7 @@ function MapObject()
     }
   };
 
+	/* CEXCLUDE */
   /** Called to get stream init data, passed to init on client */
   this.streamCreateData = function()
   {
@@ -74,6 +77,7 @@ function MapObject()
       shape: { type: "rectangle" }
     }]
   };
+	/* CEXCLUDE */
 }
 var MapObject = IgeEntityBox2d.extend(new MapObject());
 

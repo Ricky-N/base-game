@@ -416,6 +416,7 @@ function Controls()
 	 */
 	this._behaviour = function (ctx)
 	{
+		/* CEXCLUDE */
 		if (ige.isServer)
 		{
 			// var controls = this.playerControl.pressControls;
@@ -455,7 +456,8 @@ function Controls()
 				this.velocity.y(vel.y);
 			}
 		}
-		else // => ige.isClient
+		/* CEXCLUDE */
+		if(ige.isClient)
 		{
 			// this.playerControl.toggleClickControls.checkControls();
 			checkControls(this.playerControl.directionControls);

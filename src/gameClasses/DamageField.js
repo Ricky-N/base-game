@@ -25,6 +25,7 @@ function DamageField()
     var parent = ige.$(create.parentId);
     this.activeSpan = create.activeSpan;
 
+		/* CEXCLUDE */
     if(ige.isServer)
     {
       this.mount(ige.server.foregroundScene);
@@ -41,7 +42,8 @@ function DamageField()
 
       this.streamMode(1);
     }
-    else // ige.isClient
+		/* CEXCLUDE */
+    if(ige.isClient)
     {
       this.addComponent(IgeAnimationComponent).depth(1);
       var managedTexture = ige.sheetManager.registerCallback(
@@ -65,6 +67,7 @@ function DamageField()
     }
   };
 
+	/* CEXCLUDE */
   /**
    * Physics settings for the damage field. The damage field has
    * only a single fixture which is a sensor, meaning that it does
@@ -98,6 +101,7 @@ function DamageField()
       activeSpan: this.activeSpan
     });
   };
+	/* CEXCLUDE */
 
   /**
    * Activate the damage field for the activeSpan ms, hurting anything
@@ -108,6 +112,7 @@ function DamageField()
   this.activate = function(position)
   {
     var self = this;
+		/* CEXCLUDE */
     if(ige.isServer)
     {
       this.translateTo(position.x, position.y, 0);
@@ -129,7 +134,8 @@ function DamageField()
         self.deactivate();
       }, this.activeSpan);
     }
-    else
+		/* CEXCLUDE */
+    if(ige.isClient)
     {
       setTimeout(function(){
         self.animation.start("play");
@@ -137,6 +143,7 @@ function DamageField()
     }
   };
 
+	/* CEXCLUDE */
   /**
    * Deactivate the DamageField, currently does not communicate
    * with the client to stop animation.
@@ -182,6 +189,7 @@ function DamageField()
       delete this._charactersInRange[id];
     }
   };
+	/* CEXCLUDE */
 }
 var DamageField = IgeEntityBox2d.extend(new DamageField());
 

@@ -25,7 +25,8 @@ fi
   # update any packages that might have been added
   npm install
   # build for our test server
-  gulp build --test
+  gulp deploy --test
+
   forever restart /home/game/ige/server/ige.js
 
   echo "===== DONE ====="
