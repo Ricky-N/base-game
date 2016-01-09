@@ -65,14 +65,16 @@ gulp.task("deploy", ["build"], function(){
   var cwd = process.cwd();
   var to = cwd + '/deploy';
   process.chdir('../ige');
+  console.log(process.cwd());
+  console.log(cwd);
 
   // follows same setup process as server/ige.js
   // simulate arguments so it deploys instead of runs
   var command = "node ige.js -index true -deploy ../base-game/build -to " + to;
   process.argv = command.split(' ');
-  IgeBase = require('..\\ige\\engine\\core\\IgeBase');
-  IgeClass = require('..\\ige\\engine\\core\\IgeClass');
-  IgeNode = require('..\\ige\\server\\IgeNode');
+  IgeBase = require('../ige/engine/core/IgeBase');
+  IgeClass = require('../ige/engine/core/IgeClass');
+  IgeNode = require('../ige/server/IgeNode');
   var igeNode = new IgeNode();
 
   // reset the context before returning so we don't
