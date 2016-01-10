@@ -102,10 +102,13 @@ var controlUpdate = new ServerNetworkMessage("controlUpdate", function(data, cli
 			if(ability)
 			{
 				var cooldown = ability.use(data.data);
-				ige.network.send("cooldown", {
-					index: abilityIndex,
-					cooldown: cooldown
-				});
+				if(typeof cooldown === "number")
+				{
+					ige.network.send("cooldown", {
+						index: abilityIndex,
+						cooldown: cooldown
+					});
+				}
 			}
 		}
 	}

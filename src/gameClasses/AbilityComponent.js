@@ -62,12 +62,18 @@ function Ability()
    */
   this.use = function(arg)
   {
-    if(!this.onCooldown() && this.useCost())
+    // check if using should even be possible
+    if(!this.onCooldown() && this.useCost(false))
     {
-      this._onCooldown = true;
-      this._lastUsed = ige.lastTick;
-      this.onUse(arg);
-      return this.cooldown;
+      // the on use can return false to say use failed
+      if(this.onUse(arg) !== false)
+      {
+        // now we want to actually apply use costs
+        this.useCost(true);
+        this._onCooldown = true;
+        this._lastUsed = ige.lastTick;
+        return this.cooldown;
+      }
     }
     // TODO: some failure status reason should be returned
   };
@@ -76,9 +82,9 @@ function Ability()
    * if possible, claims cost for using this ability
    * @return {Boolean} whether possible to use the ability
    */
-  this.useCost = function()
+  this.useCost = function(apply)
   {
-    return AbilityCostFunctions[this.costType](this._entity, this.cost);
+    return AbilityCostFunctions[this.costType](this._entity, this.cost, apply);
   };
 
   /**
@@ -98,12 +104,15 @@ var Ability = IgeClass.extend(new Ability());
  *  whether an ability can be used or not
  */
 var AbilityCostFunctions = {
-  power: function(entity, cost)
+  power: function(entity, cost, apply)
   {
     var status = entity.status;
     if(status.power() >= cost)
     {
-      status.power(status.power() - cost);
+      if(apply === true)
+      {
+        status.power(status.power() - cost);
+      }
       return true;
     }
     return false;
@@ -264,15 +273,26 @@ function Spikes(entity)
 function Explosion(entity)
 {
   var explosion = new Ability("explosion", entity, 2000, "power", 20);
-  var pos = { x: entity.translate().x(), y: entity.translate().y };
+  var pos = { x: entity._translate.x, y: entity._translate.y };
   var field = new DamageField({
     activeSpan: 300,
     damage: 15,
     position: { x: 0, y: 0 } // TODO: first activation hits 0,0 for some reason
   });
+  var maxRange = 300;
   explosion.onUse = function(point)
   {
-    field.activate(point);
+    // calculate straight line distance to the object
+    var connectingVector = Math2d.subtract(entity._translate, point);
+    var distance = Math2d.pythagoras(connectingVector);
+    if(distance <= maxRange)
+    {
+      field.activate(point);
+    }
+    else
+    {
+      return false;
+    }
   };
   explosion.explosionField = field;
   return explosion;
