@@ -58,8 +58,8 @@ gulp.task("server:static", function() {
 gulp.task("deploy", ["build"], function(){
   // index is sourced from in ige/server/deploy/index.html
   // as it has slightly different requirements.
-  // gulp.src("src/index.html")
-  //   .pipe(gulp.dest("deploy"));
+  gulp.src("src/index.html")
+    .pipe(gulp.dest("deploy"));
 
   // the deploy script needs to execute in that context
   var cwd = process.cwd();
@@ -70,7 +70,7 @@ gulp.task("deploy", ["build"], function(){
 
   // follows same setup process as server/ige.js
   // simulate arguments so it deploys instead of runs
-  var command = "node ige.js -index true -deploy ../base-game/build -to " + to;
+  var command = "node ige.js true -deploy ../base-game/build -to " + to;
   process.argv = command.split(' ');
   IgeBase = require('../ige/engine/core/IgeBase');
   IgeClass = require('../ige/engine/core/IgeClass');
