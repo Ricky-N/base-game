@@ -1,3 +1,4 @@
+/*jshint -W004 */
 /**
  * The set of abilities that can be used in the game. Each ability
  * has a representation that helps players build that ability, a set
@@ -105,13 +106,25 @@ function Abilities()
     };
 
     /**
-     * each ability must be able to validate required parameters and determine
-     * if the given parameters are sufficient to create an instance
+     * each ability must provide the set of parameters and constraints
+     * on those parameters so that we can generate a UI for picking them.
+     * The ability must also be able to take parameters that were set and
+     * appropriately validate and store them. If not overridden, it is
+     * assumed that there are no tunable parameters for an ability
      */
-    this.validate = function(params)
+    this.parameters = function(pars)
     {
-      throw "Ability.validate must be overridden by Ability instances";
-    }
+      if(typeof pars === "undefined")
+      {
+        // no tunable parameters
+        return [];
+      }
+      else
+      {
+        // and nothing to do when called
+        return;
+      }
+    };
   }
   var Ability = IgeClass.extend(new Ability());
 
@@ -203,127 +216,192 @@ function Abilities()
    * probably be nuked once truly player set abilities are possible
    * @class
    */
-  this.Daggers = function()
+  function Daggers()
   {
-    var daggers = new ProjectileAbility(
-        "daggers", entity, 2000, "power", 10
-    );
+    this.classId = "Daggers";
 
-    daggers.projectileInfo = {
+    this.init = function(entity)
+    {
+      ProjectileAbility.prototype.init.call(
+        this, "daggers", entity, 2000, "power", 10
+      );
+    };
+
+    this.projectileInfo = {
       category: "large", speed: 0.5, height: 32, width: 32,
       damage: 23, lifeSpan: 900, cellRow: 13, cellCol: 4
     };
 
-    daggers.cellSheetInfo = {
+    this.cellSheetInfo = {
       sheet: "./textures/tiles/tilee5.png",
       columns: 16,
       rows: 16,
     };
-
-    return daggers;
   }
+  this.Daggers = ProjectileAbility.extend(new Daggers());
 
-  this.Heal = function(entity)
+  /**
+   * Ability that heals for 30% of currently missing health
+   * @class
+   */
+  function Heal()
   {
-    // heal 30% of missing health
-    var heal = new Ability("heal", entity, 2000, "power", 20);
+    this.classId = "Heal";
 
-    heal.onUse = function()
+    this.init = function(entity)
     {
-      var status = entity.status;
+      Ability.prototype.init.call(this, "heal", entity, 2000, "power", 20);
+    };
+
+    this.onUse = function()
+    {
+      var status = this._entity.status;
       status.health(status.health() + 0.30 * (100 - status.health()));
     };
-    return heal;
   }
+  this.Heal = Ability.extend(new Heal());
 
-  this.Dash = function(entity)
+  /**
+   * Ability that gives a big velocity in target Direction
+   * for a short period of time
+   * @class
+   */
+  function Dash()
   {
-    // TODO fix bug related to dash when standing still
-    var dash = new Ability("dash", entity, 3500, "power", 9);
-    dash.controlType = "ToggleClickControl";
-    dash.onUse = function(point)
+    this.classId = "Dash";
+
+    this.init = function(entity)
     {
+      Ability.prototype.init.call(this, "dash", entity, 3500, "power", 9);
+    };
+
+    this.controlType = "ToggleClickControl";
+
+    this.onUse = function(point)
+    {
+      // TODO fix bug related to dash when standing still
       // TODO: this seems pretty common, refactor in some way
-      var entityPosition = entity.worldPosition();
+      var entityPosition = this._entity.worldPosition();
       var direction = Math2d.subtract(point, entityPosition);
       var norm = Math2d.normalize(direction);
       var velocity = Math2d.scale(norm, 20);
 
-      entity.status._movementEnabled = false;
-      entity.status._dashing = true;
-      entity._box2dBody.SetLinearVelocity(velocity);
+      this._entity.status._movementEnabled = false;
+      this._entity.status._dashing = true;
+      this._entity._box2dBody.SetLinearVelocity(velocity);
+
+      var self = this;
       setTimeout(function()
       {
-        entity.status._movementEnabled = true;
-        entity.status._dashing = false;
-        entity._box2dBody.SetLinearVelocity(new Vector2d(0,0));
+        self._entity.status._movementEnabled = true;
+        self._entity.status._dashing = false;
+        self._entity._box2dBody.SetLinearVelocity(new Vector2d(0,0));
       }, 300);
     };
-    return dash;
   }
+  this.Dash = Ability.extend(new Dash());
 
-  this.Rocks = function(entity)
+  /**
+   * Throws a smaller, faster, less damaging projectile
+   * in the target direction, should probably be removed
+   * once player defined abilities are set up better
+   * @class
+   */
+  function Rocks()
   {
-    var rocks = new ProjectileAbility("rocks", entity, 1000, "power", 1.5);
-    rocks.controlType = "ToggleClickControl";
-    rocks.projectileInfo = {
+    this.classId = "Rocks";
+
+    this.init = function(entity)
+    {
+      ProjectileAbility.prototype.init.call(
+        this, "rocks", entity, 1000, "power", 1.5
+      );
+    };
+
+    this.controlType = "ToggleClickControl";
+
+    this.projectileInfo = {
       category: "small", speed: 0.7, height: 10, width: 10,
       damage: 6, lifeSpan: 500, cellRow: 6, cellCol: 4
     };
-    rocks.cellSheetInfo = {
+
+    this.cellSheetInfo = {
       sheet: "./textures/tiles/tilee5.png",
       columns: 16,
       rows: 16,
     };
-    return rocks;
   }
+  this.Rocks = ProjectileAbility.extend(new Rocks());
 
-  this.Spikes = function(entity)
+  /**
+   * Erupts spikes around the player greatly damaging
+   * any other players close by
+   * @class
+   */
+  function Spikes()
   {
-    var spikes = new Ability("spikes", entity, 1500, "power", 15);
+    this.classId = "Spikes";
 
-    var pos = { x: entity.translate().x(), y: entity.translate().y };
-    spikes.attackField = new DamageField({
-      parentId: entity.id(),
-      activeSpan: 300,
-      damage: 30,
-      position: { x: pos.x, y: pos.y }
-    });
-    entity.followingChildren.push(spikes.attackField);
-    auto.onUse = function(point)
+    this.init = function(entity)
     {
-      spikes.attackField.activate();
-    };
-    return spikes;
-  }
+      Ability.prototype.init.call(this, "spikes", entity, 1500, "power", 15);
 
-  this.Explosion = function(entity)
+      this.attackField = new DamageField({
+        parentId: entity.id(),
+        activeSpan: 300,
+        damage: 30,
+        position: {
+          x: entity._translate.x,
+          y: entity._translate.y
+        }
+      });
+      entity.followingChildren.push(this.attackField);
+    };
+
+    this.onUse = function(point)
+    {
+      this.attackField.activate();
+    };
+  }
+  this.Spikes = Ability.extend(new Spikes());
+
+  /**
+   * Erupts spikes at target location within a certain
+   * range dealing moderate damage
+   * @class
+   */
+  function Explosion()
   {
-    var explosion = new Ability("explosion", entity, 2000, "power", 20);
-    var pos = { x: entity._translate.x, y: entity._translate.y };
-    var field = new DamageField({
-      activeSpan: 300,
-      damage: 15,
-      position: { x: 0, y: 0 } // TODO: first activation hits 0,0 for some reason
-    });
-    var maxRange = 300;
-    explosion.onUse = function(point)
+    this.classId = "Explosion";
+
+    this.init = function(entity)
+    {
+      Ability.prototype.init.call(this, "explosion", entity, 2000, "power", 20);
+      this.maxRange = 300;
+
+      this.field = new DamageField({
+        activeSpan: 300,
+        damage: 15,
+        position: { x: 0, y: 0 } // TODO: first activation hits 0,0 for some reason
+      });
+    };
+
+    this.onUse = function(point)
     {
       // calculate straight line distance to the object
-      var connectingVector = Math2d.subtract(entity._translate, point);
+      var connectingVector = Math2d.subtract(this._entity._translate, point);
       var distance = Math2d.pythagoras(connectingVector);
       if(distance <= maxRange)
       {
-        field.activate(point);
+        this.field.activate(point);
       }
       else
       {
         return false;
       }
     };
-    explosion.explosionField = field;
-    return explosion;
   }
+  this.Explosion = Ability.extend(new Explosion());
 }
 
 if (typeof(module) !== "undefined" && typeof(module.exports) !== "undefined")

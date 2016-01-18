@@ -41,7 +41,7 @@ function AbilityComponent()
       for(i = 0; i < 4; i++)
       {
         if(options.abilities[i] &&
-             optionMapping.hasOwnProperty(options.abilities[i]))
+           optionMapping.hasOwnProperty(options.abilities[i]))
         {
           abilityChoices[i] = options.abilities[i];
         }
@@ -111,7 +111,7 @@ function AbilityComponent()
   this.updateAbility = function(index, selection)
   {
     throw "Not implemented";
-  }
+  };
 }
 
 var AbilityComponent = IgeEntity.extend(new AbilityComponent());

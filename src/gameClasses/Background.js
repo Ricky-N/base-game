@@ -70,17 +70,17 @@ function Background(mainScene){
     this.entities = [];
     layersToRemove = [];
     var j;
-    for(var i = 0; i < Map.layers.length; i++)
+    for(var i = 0; i < GameMap.layers.length; i++)
     {
       // if it is an object layer it is purely something we
       // should turn into static physics objects
-      if(Map.layers[i].type === "objectgroup")
+      if(GameMap.layers[i].type === "objectgroup")
       {
         layersToRemove.push(i);
-        var len = Map.layers[i].objects.length;
+        var len = GameMap.layers[i].objects.length;
         for(j = 0; j < len; j++)
         {
-          var mapObject = Map.layers[i].objects[j];
+          var mapObject = GameMap.layers[i].objects[j];
 
           // We will get coordinates from object top left coming
           // out of Tiled, but ige deals with object centers
@@ -104,24 +104,25 @@ function Background(mainScene){
       {
         // for now we assume baselayer is always a client texture, they need
         // to display something! but everything else is fair game to remove
-        if(Map.layers[i].name !== "BaseLayer")
+        if(GameMap.layers[i].name !== "BaseLayer")
         {
-          var data = Map.layers[i].data;
+          var data = GameMap.layers[i].data;
           for(j = 0; j < data.length; j++)
           {
-            var mapping = Map.tilephysics[data[j]];
+            var mapping = GameMap.tilephysics[data[j]];
             if(typeof mapping !== "undefined")
             {
               // position is tricky here as the Tiled information will come
               // in tiles, but the image placement for images larger than a
               // single tile width is such that the image grows up and right
               // from the tile it was placed on. This is wrong for the y!
-              var bottomTileBottom = Math.floor(j / Map.width) * Map.tileheight + Map.tileheight;
+              var bottomTileBottom =
+                Math.floor(j / GameMap.width) * GameMap.tileheight + GameMap.tileheight;
 
               // doing this without cloning isn't the greatest
               // thing to do, but we want efficiency damn it!
               mapping.position = {
-                "x": (j % Map.width) * Map.tilewidth + 0.5 * mapping.width,
+                "x": (j % GameMap.width) * GameMap.tilewidth + 0.5 * mapping.width,
                 "y": bottomTileBottom - (0.5 * mapping.height)
               };
 
@@ -153,9 +154,9 @@ function Background(mainScene){
     // as they had contained only MapObjects
     for(i = 0; i < layersToRemove.length; i++)
     {
-      Map.layers.remove(layersToRemove[i]);
+      GameMap.layers.remove(layersToRemove[i]);
     }
-    delete Map.tilephysics;
+    delete GameMap.tilephysics;
   }
 	/* CEXCLUDE */
   return self;

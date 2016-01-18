@@ -41,7 +41,7 @@ function AbilityStep(name, type, params)
     // each ability has required parameters, let's make sure those
     // are satisfied here as well
     return Abilities[this.type].validate(params);
-  }
+  };
 }
 
 if (typeof(module) !== "undefined" && typeof(module.exports) !== "undefined")

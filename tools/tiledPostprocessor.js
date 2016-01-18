@@ -59,8 +59,8 @@ for(var i = 0; i < data.tilesets.length; i ++)
 
 data.tilephysics = MapObjects;
 
-var jsOut = "var Map = " + JSON.stringify(data) +
-";if (typeof(module) !== 'undefined' && typeof(module.exports) !== 'undefined') { module.exports = Map; }";
+var jsOut = "var GameMap = " + JSON.stringify(data) +
+";if (typeof(module) !== 'undefined' && typeof(module.exports) !== 'undefined') { module.exports = GameMap; }";
 
 
 fs.writeFileSync("assets/map/map.js", jsOut);

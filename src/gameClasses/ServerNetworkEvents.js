@@ -127,7 +127,7 @@ var requestMap = new ServerNetworkMessage("requestMap", function(data, clientId,
 	// Send the Map data back
 	// TODO, have this loaded somehow other than through that js file
 	// such as persistent db document
-	ige.network.response(requestId, Map);
+	ige.network.response(requestId, GameMap);
 });
 ServerNetworkEvents.incoming.push(requestMap);
 
