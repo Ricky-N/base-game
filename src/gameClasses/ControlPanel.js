@@ -133,8 +133,7 @@ function ControlPanel(mainScene)
     .styleClass("rounded")
     .mount(buttonPanel);
 
-  button._value = "Menu";
-  button._mouseDown = function(){
+  this.toggleMenu = function(){
     if(self.menu._hidden)
     {
       self.menu.show();
@@ -143,6 +142,8 @@ function ControlPanel(mainScene)
       self.menu.hide();
     }
   };
+  button._value = "Menu";
+  button._mouseDown = this.toggleMenu;
 
   // health / power indicators will take up the
   // middle of the control panel

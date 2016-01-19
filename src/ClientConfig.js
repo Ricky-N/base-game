@@ -2,9 +2,11 @@ var igeClientConfig = {
 	include: [
 		"./gameClasses/SheetManager.js",
 		"./gameClasses/ClientNetworkEvents.js",
+		"./gameClasses/Background.js",
 		"./gameClasses/StatusComponent.js",
 		"./gameClasses/Projectile.js",
 		"./gameClasses/DamageField.js",
+		"./gameClasses/ScalingManager.js",
 		"./gameClasses/Abilities.js",
 		"./gameClasses/AbilityStep.js",
 		"./gameClasses/AbilitySelection.js",
@@ -12,7 +14,6 @@ var igeClientConfig = {
 		"./gameClasses/PlayerComponent.js",
 		"./gameClasses/ControlPanel.js",
 		"./gameClasses/MapObject.js",
-		"./gameClasses/Background.js",
 		"./client.js",
 		"./index.js"
 	]

@@ -113,14 +113,13 @@ gulp.task("watch", ["server"], function () {
     });
 });
 
-// guppy is acting up so turn this off for now
-// gulp.task("pre-commit", function() {
-//   return guppy()(gulp).stream("pre-commit")
-//     .pipe(gulpFilter()(["src/*.js"]))
-//     .pipe(jshint()(".jshintrc"))
-//     .pipe(jshint().reporter("default"))
-//     .pipe(jshint().reporter("fail"));
-// });
+gulp.task("pre-commit", function() {
+  return guppy()(gulp).stream("pre-commit")
+    .pipe(gulpFilter()(["src/*.js"]))
+    .pipe(jshint()(".jshintrc"))
+    .pipe(jshint().reporter("default"))
+    .pipe(jshint().reporter("fail"));
+});
 
 gulp.task("default", function(){
   console.log("No default, try one of:");

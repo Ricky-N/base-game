@@ -120,64 +120,68 @@ function PressControl()
 }
 var PressControl = Control.extend(new PressControl());
 
-// /**
-//  * A ToggleControl is turned on first button activation, and off on the second
-//  */
-// function ToggleControl()
-// {
-// 	this.classId = "ToggleControl";
-//
-// 	this.init = function()
-// 	{
-// 		var self = this;
-// 		this._active = false;
-//
-// 		this._control = new Control();
-// 		this._control.onActivation = function()
-// 		{
-// 			self._active = !self._active;
-// 			if(self._active)
-// 			{
-// 				self.onActivation();
-// 			}
-// 			else
-// 			{
-// 				self.onDeactivation();
-// 			}
-// 		};
-// 		this._control.onDeactivation = function(){};
-// 	};
-//
-// 	// used to force reset of all state back to off while calling properly
-// 	this.clear = function()
-// 	{
-// 		// this will call ondeactivate for sure and onactivate if it was
-// 		// already in a low state.
-// 		this._control.activate();
-// 		this._control.deactivate();
-// 	};
-//
-// 	this.activate = function()
-// 	{
-// 		this._control.activate();
-// 	};
-//
-// 	this.deactivate = function()
-// 	{
-// 		this._control.deactivate();
-// 	};
-//
-// 	this.onActivation = function()
-// 	{
-// 		throw "Must be overridden by child classes";
-// 	};
-//
-// 	this.onDeactivation = function()
-// 	{
-// 		throw "Must be overridden by child classes";
-// 	};
-// }
-// var ToggleControl = IgeClass.extend(new ToggleControl());
+/**
+ * A ToggleControl is turned on first button activation, and off on the second
+ */
+function ToggleControl()
+{
+	this.classId = "ToggleControl";
+
+	/**
+	 * Instantiates a new Toggle Control
+	 */
+	this.init = function()
+	{
+		var self = this;
+		this._active = false;
+
+		this._control = new Control();
+		this._control.onActivation = function()
+		{
+			self._active = !self._active;
+			if(self._active)
+			{
+				self.onActivation();
+			}
+			else
+			{
+				self.onDeactivation();
+			}
+		};
+		this._control.onDeactivation = function(){};
+	};
+
+	// used to force reset of all state back to off while calling properly
+	this.clear = function()
+	{
+		// this will call ondeactivate for sure and onactivate if it was
+		// already in a low state.
+		this._control.activate();
+		this._control.deactivate();
+	};
+
+	this.activate = function()
+	{
+		this._control.activate();
+	};
+
+	this.deactivate = function()
+	{
+		this._control.deactivate();
+	};
+
+	this.onActivation = function()
+	{
+		throw "Must be overridden by child classes";
+	};
+
+	this.onDeactivation = function()
+	{
+		throw "Must be overridden by child classes";
+	};
+}
+var ToggleControl = IgeClass.extend(new ToggleControl());
+
 //
 // /**
 //  * A ToggleClickControl is one that is activated by a button press. Once the
@@ -354,6 +358,15 @@ function Controls()
 
 		if(ige.isClient)
 		{
+			// set up menu control
+			ige.input.mapAction("menu", ige.input.key.m);
+			var menuControl = new ToggleControl();
+
+			menuControl.action = "menu";
+			menuControl.onActivation = ige.client.controlPanel.toggleMenu;
+			menuControl.onDeactivation = ige.client.controlPanel.toggleMenu;
+			this.settingsControls = { "menu": menuControl };
+
 			ige.client.mainScene.mouseDown(function(e, control)
 			{
 				var mousePos = ige._currentViewport.mousePos();
@@ -459,6 +472,9 @@ function Controls()
 		/* CEXCLUDE */
 		if(ige.isClient)
 		{
+			// check the basic settings controls
+			checkControls(this.playerControl.settingsControls);
+
 			// this.playerControl.toggleClickControls.checkControls();
 			checkControls(this.playerControl.directionControls);
 			// checkControls(this.playerControl.pressControls);
