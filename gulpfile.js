@@ -48,6 +48,7 @@ gulp.task("server:socket", ["build"], function(){
 gulp.task("server:static", function() {
   gulp.src(["build", "../ige", "assets"])
     .pipe(staticServer()({
+      host: "0.0.0.0",
       fallback: "devIndex.html"
     }));
 });
@@ -88,6 +89,7 @@ gulp.task("server:deploy", ["server:socket", "server:deploy:static"]);
 gulp.task("server:deploy:static", ["deploy"], function() {
   gulp.src(["deploy", "assets"])
     .pipe(staticServer()({
+      host: "0.0.0.0",
       fallback: "deploy/index.html"
     }));
 });
