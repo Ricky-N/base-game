@@ -49,7 +49,8 @@ gulp.task("server:static", function() {
   gulp.src(["build", "../ige", "assets"])
     .pipe(staticServer()({
       host: "0.0.0.0",
-      fallback: "devIndex.html"
+      fallback: "devIndex.html",
+      directoryListing: true
     }));
 });
 
