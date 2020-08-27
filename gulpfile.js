@@ -34,7 +34,7 @@ gulp.task("build", function() {
     // TODO: real templating support!
     .pipe(gulpif()(yargs().argv.test,
       replace()("localhost",
-                "gameserver.westus.cloudapp.azure.com")))
+                "woods.niemi.online")))
     .pipe(gulp.dest("build"));
 });
 
