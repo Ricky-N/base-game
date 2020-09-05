@@ -34,7 +34,7 @@ gulp.task("build", function() {
     // TODO: real templating support!
     .pipe(gulpif()(yargs().argv.test,
       replace()("http://localhost",
-                "https://woods.niemi.online")))
+                "http://woods.niemi.online")))
     .pipe(gulp.dest("build"));
 });
 
