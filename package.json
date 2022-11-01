@@ -21,7 +21,7 @@
   "license": "MIT",
   "devDependencies": {
     "git-guppy": "^1.0.1",
-    "gulp": "^3.9.0",
+    "gulp": "^4.0.2",
     "gulp-develop-server": "^0.5.0",
     "gulp-esdoc": "^0.2.0",
     "gulp-filter": "^3.0.1",
@@ -29,7 +29,7 @@
     "gulp-jshint": "^2.0.0",
     "gulp-replace": "^0.5.4",
     "gulp-webserver": "^0.9.1",
-    "guppy-pre-commit": "^0.3.0",
+    "guppy-pre-commit": "^0.4.0",
     "jsdoc": "^3.4.0",
     "jshint": "^2.8.0",
     "lazy-req": "^1.1.0",
